@@ -770,6 +770,26 @@
         "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/openai/latest#list-vector-stores?view=foundry"
       },
       {
+        "title": "2024-10-21 API reference",
+        "href": "openai/reference",
+        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/openai/reference?view=foundry"
+      },
+      {
+        "title": "v1 Preview API",
+        "href": "openai/reference-preview-latest",
+        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/openai/reference-preview-latest?view=foundry"
+      },
+      {
+        "title": "2025-04-01-preview - Authoring",
+        "href": "openai/authoring-reference-preview",
+        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/openai/authoring-reference-preview?view=foundry"
+      },
+      {
+        "title": "2025-04-01-preview - Inference",
+        "href": "openai/reference-preview",
+        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/openai/reference-preview?view=foundry"
+      },
+      {
         "title": "Azure OpenAI monitoring data reference",
         "href": "openai/monitor-openai-reference",
         "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/openai/monitor-openai-reference?view=foundry"
@@ -1113,6 +1133,11 @@
         "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/how-to/upgrade-azure-openai?view=foundry"
       },
       {
+        "title": "Migrate from Azure AI Inference SDK to OpenAI SDK",
+        "href": "how-to/model-inference-to-openai-migration",
+        "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/how-to/model-inference-to-openai-migration?view=foundry"
+      },
+      {
         "title": "Create and manage projects",
         "href": "how-to/create-projects",
         "url": "https://learn.microsoft.com/en-us/azure/ai-foundry/how-to/create-projects?view=foundry"
@@ -1403,6 +1428,6 @@
       }
     ]
   },
-  "total_pages": 273,
-  "generated_at": "2026-02-26T03:55:41Z"
+  "total_pages": 278,
+  "generated_at": "2026-02-27T03:53:25Z"
 }
