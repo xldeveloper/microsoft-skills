@@ -931,6 +931,13 @@
     "package": "@azure/web-pubsub, @azure/web-pubsub-client"
   },
   {
+    "name": "cloud-solution-architect",
+    "description": "Transform the agent into a Cloud Solution Architect following Azure Architecture Center best practices. Use when designing cloud architectures, reviewing system designs, selecting architecture styles, applying cloud design patterns, making technology choices, or conducting Well-Architected Framework reviews.",
+    "lang": "core",
+    "category": "general",
+    "path": ".github/skills/cloud-solution-architect"
+  },
+  {
     "name": "continual-learning",
     "description": "Guide for implementing continual learning in AI coding agents — hooks, memory scoping, reflection patterns. Use when setting up learning infrastructure for agents.",
     "lang": "core",

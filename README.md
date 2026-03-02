@@ -12,7 +12,7 @@ Skills, custom agents, AGENTS.md templates, and MCP configurations for AI coding
 
 > **Blog post:** [Context-Driven Development: Agent Skills for Microsoft Foundry and Azure](https://devblogs.microsoft.com/all-things-azure/context-driven-development-agent-skills-for-microsoft-foundry-and-azure/)
 
-> **🔍 Skill Explorer:** [Browse all 131 skills with 1-click install](https://microsoft.github.io/skills/)
+> **🔍 Skill Explorer:** [Browse all 132 skills with 1-click install](https://microsoft.github.io/skills/)
 
 ## Quick Start
 
@@ -59,7 +59,7 @@ Coding agents like [Copilot CLI](https://github.com/features/copilot/cli) are po
 
 | Resource | Description |
 |----------|-------------|
-| **[126 Skills](#skill-catalog)** | Domain-specific knowledge for Azure SDK and Foundry development |
+| **[127 Skills](#skill-catalog)** | Domain-specific knowledge for Azure SDK and Foundry development |
 | **[Plugins](#plugins)** | Installable plugin packages (deep-wiki, azure-skills and more) |
 | **[Custom Agents](#agents)** | Role-specific agents (backend, frontend, infrastructure, planner) |
 | **[AGENTS.md](AGENTS.md)** | Template for configuring agent behavior in your projects |
@@ -70,11 +70,11 @@ Coding agents like [Copilot CLI](https://github.com/features/copilot/cli) are po
 
 ## Skill Catalog
 
-> 131 skills in `.github/skills/` — flat structure with language suffixes for automatic discovery
+> 132 skills in `.github/skills/` — flat structure with language suffixes for automatic discovery
 
 | Language | Count | Suffix | 
 |----------|-------|--------|
-| [Core](#core) | 7 | — |
+| [Core](#core) | 8 | — |
 | [Python](#python) | 41 | `-py` |
 | [.NET](#net) | 28 | `-dotnet` |
 | [TypeScript](#typescript) | 25 | `-ts` |
@@ -85,10 +85,11 @@ Coding agents like [Copilot CLI](https://github.com/features/copilot/cli) are po
 
 ### Core
 
-> 7 skills — tooling, infrastructure, language-agnostic
+> 8 skills — tooling, infrastructure, language-agnostic
 
 | Skill | Description |
 |-------|-------------|
+| [cloud-solution-architect](.github/skills/cloud-solution-architect/) | Design well-architected Azure cloud systems. Architecture styles, 44 design patterns, technology choices, mission-critical design, WAF pillars. |
 | [copilot-sdk](.github/skills/copilot-sdk/) | Build applications powered by GitHub Copilot using the Copilot SDK. Session management, custom tools, streaming, hooks, MCP servers, BYOK, deployment patterns. |
 | [frontend-design-review](.github/skills/frontend-design-review/) | Review and create distinctive frontend interfaces. Design system compliance, quality pillars, accessibility, and creative aesthetics. |
 | [github-issue-creator](.github/skills/github-issue-creator/) | Convert raw notes, error logs, or screenshots into structured GitHub issues. |
