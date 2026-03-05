@@ -44,7 +44,7 @@ ln -s ../.github/skills .claude/skills
 
 ---
 
-Coding agents like [Copilot CLI](https://github.com/features/copilot/cli) are powerful, but they lack domain knowledge about your SDKs. The patterns are already in their weights from pretraining. All you need is the right activation context to surface them.
+Coding agents like [Copilot CLI](https://github.com/features/copilot/cli) and [GitHub Copilot in VS Code](https://code.visualstudio.com/docs/copilot/customization/agent-skills) are powerful, but they lack domain knowledge about your SDKs. The patterns are already in their weights from pretraining. All you need is the right activation context to surface them.
 
 > [!IMPORTANT]
 > **Use skills selectively.** Loading all skills causes context rot: diluted attention, wasted tokens, conflated patterns. Only copy skills essential for your current project.
