@@ -23,8 +23,8 @@ from urllib.parse import urljoin
 import time
 
 # Base URLs
-BASE_URL = "https://learn.microsoft.com/en-us/azure/ai-foundry/"
-TOC_URL = "https://learn.microsoft.com/en-us/azure/ai-foundry/toc.json?view=foundry"
+BASE_URL = "https://learn.microsoft.com/en-us/azure/foundry/"
+TOC_URL = "https://learn.microsoft.com/en-us/azure/foundry/toc.json"
 VIEW_PARAM = "?view=foundry"
 
 # Output paths
