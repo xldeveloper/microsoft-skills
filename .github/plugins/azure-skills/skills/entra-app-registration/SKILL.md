@@ -1,6 +1,6 @@
 ---
 name: entra-app-registration
-description: "Guides Microsoft Entra app registration, OAuth 2.0 authentication, and MSAL integration. USE FOR: create app registration, register Microsoft Entra app, configure OAuth, set up authentication, add API permissions, generate service principal, MSAL example, console app auth, Entra ID setup, Microsoft Entra authentication. DO NOT USE FOR: Azure RBAC or role assignments (use azure-rbac), Key Vault secrets (use azure-keyvault-expiration-audit), Azure resource security (use azure-security)."
+description: "Guides Microsoft Entra ID app registration, OAuth 2.0 authentication, and MSAL integration. USE FOR: create app registration, register Azure AD app, configure OAuth, set up authentication, add API permissions, generate service principal, MSAL example, console app auth, Entra ID setup, Azure AD authentication. DO NOT USE FOR: Azure RBAC or role assignments (use azure-rbac), Key Vault secrets (use azure-keyvault-expiration-audit), Azure resource security (use azure-security)."
 license: MIT
 metadata:
   author: Microsoft
@@ -9,7 +9,7 @@ metadata:
 
 ## Overview
 
-Microsoft Entra ID is Microsoft's cloud-based identity and access management service. App registrations allow applications to authenticate users and access Azure resources securely.
+Microsoft Entra ID (formerly Azure Active Directory) is Microsoft's cloud-based identity and access management service. App registrations allow applications to authenticate users and access Azure resources securely.
 
 ### Key Concepts
 
@@ -17,7 +17,7 @@ Microsoft Entra ID is Microsoft's cloud-based identity and access management ser
 |---------|-------------|
 | **App Registration** | Configuration that allows an app to use Microsoft identity platform |
 | **Application (Client) ID** | Unique identifier for your application |
-| **Tenant ID** | Unique identifier for your Microsoft Entra tenant/directory |
+| **Tenant ID** | Unique identifier for your Azure AD tenant/directory |
 | **Client Secret** | Password for the application (confidential clients only) |
 | **Redirect URI** | URL where authentication responses are sent |
 | **API Permissions** | Access scopes your app requests |
@@ -148,10 +148,7 @@ Set up daemon/service authentication without user interaction.
 MSAL is the recommended library for integrating Microsoft identity platform.
 
 **Supported Languages:**
-
-- .NET - `Microsoft.Identity.Client`
-- Go - `github.com/AzureAD/microsoft-authentication-library-for-go`
-- Java - `msal4j`
+- .NET/C# - `Microsoft.Identity.Client`
 - JavaScript/TypeScript - `@azure/msal-browser`, `@azure/msal-node`
 - Python - `msal`
 
@@ -173,8 +170,8 @@ MSAL is the recommended library for integrating Microsoft identity platform.
 
 ## SDK Quick References
 
-- **Azure Identity**: [.NET](references/sdk/azure-identity-dotnet.md) | [Go](references/sdk/azure-identity-go.md) | [Java](references/sdk/azure-identity-java.md) | [JavaScript / TypeScript](references/sdk/azure-identity-ts.md) | [Python](references/sdk/azure-identity-py.md) | [Rust](references/sdk/azure-identity-rust.md)
-- **Key Vault (secrets)**: [Python](references/sdk/azure-keyvault-py.md) | [JavaScript / TypeScript](references/sdk/azure-keyvault-secrets-ts.md)
+- **Azure Identity**: [Python](references/sdk/azure-identity-py.md) | [.NET](references/sdk/azure-identity-dotnet.md) | [TypeScript](references/sdk/azure-identity-ts.md) | [Java](references/sdk/azure-identity-java.md) | [Rust](references/sdk/azure-identity-rust.md)
+- **Key Vault (secrets)**: [Python](references/sdk/azure-keyvault-py.md) | [TypeScript](references/sdk/azure-keyvault-secrets-ts.md)
 - **Auth Events**: [.NET](references/sdk/microsoft-azure-webjobs-extensions-authentication-events-dotnet.md)
 
 ## References

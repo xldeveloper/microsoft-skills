@@ -1,17 +1,13 @@
-# Authentication Events — .NET Library Quick Reference
+# Authentication Events — .NET SDK Quick Reference
 
 > Condensed from **microsoft-azure-webjobs-extensions-authentication-events-dotnet**.
 > Full patterns (attribute collection, OTP customization, external data enrichment)
 > in the source plugin skill if installed.
 
 ## Install
-
-```bash
 dotnet add package Microsoft.Azure.WebJobs.Extensions.AuthenticationEvents
-```
 
-## Quickstart
-
+## Quick Start
 ```csharp
 using Microsoft.Azure.WebJobs.Extensions.AuthenticationEvents;
 using Microsoft.Azure.WebJobs.Extensions.AuthenticationEvents.TokenIssuanceStart;
@@ -31,7 +27,6 @@ public static WebJobsAuthenticationEventResponse Run(
 ```
 
 ## Best Practices
-
 - Validate all inputs — never trust request data; validate before processing
 - Handle errors gracefully — return appropriate error responses, don't throw
 - Log correlation IDs — use CorrelationId for troubleshooting
