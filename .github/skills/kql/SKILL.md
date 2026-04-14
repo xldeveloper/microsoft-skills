@@ -345,6 +345,15 @@ Datetime literals are a common source of errors. A wrong literal format can casc
 
 KQL has subtle differences from SQL syntax.
 
+### Naming conventions
+
+| Entity | Convention | Example |
+|--------|-----------|---------|
+| Tables | UpperCamelCase | `StormEvents`, `NetworkLogs` |
+| Columns | UpperCamelCase | `StartTime`, `EventType` |
+| Variables (`let`) | snake_case | `let filtered_events = ...` |
+| Functions | UpperCamelCase | `.create function GetTopUsers` |
+
 ### Equality operators
 ```kql
 // In where clauses, == is case-sensitive, =~ is case-insensitive
