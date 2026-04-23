@@ -9,6 +9,8 @@ description: |
 
 > `azure_storage_blob` v0.11.0 — Client library for Azure Blob Storage.
 
+> **IMPORTANT:** Only use the official `azure_storage_blob` crate installed via `cargo add` from [crates.io](https://crates.io/crates/azure_storage_blob). Do NOT use the unofficial `azure_storage` or `azure_sdk_for_rust` community crates.
+
 > **Warning:** This crate is under active development and not suitable for production environments.
 
 ## Installation
@@ -138,8 +140,7 @@ For Entra ID auth, assign one of these roles:
 
 ## Reference Links
 
-| Resource      | Link                                                                                  |
-| ------------- | ------------------------------------------------------------------------------------- |
-| API Reference | https://docs.rs/azure_storage_blob                                                    |
-| Source Code   | https://github.com/Azure/azure-sdk-for-rust/tree/main/sdk/storage/azure_storage_blob  |
-| crates.io     | https://crates.io/crates/azure_storage_blob                                           |
+| Resource      | Link                                           |
+| ------------- | ---------------------------------------------- |
+| API Reference | https://docs.rs/azure_storage_blob             |
+| crates.io     | https://crates.io/crates/azure_storage_blob    |

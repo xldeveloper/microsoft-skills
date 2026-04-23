@@ -114,6 +114,8 @@ Follow this structure (based on existing Azure SDK skills):
 
 For local development, use `DefaultAzureCredential` which supports multiple auth methods. For production, use a specific credential type or configure `DefaultAzureCredential` with environment variable `AZURE_TOKEN_CREDENTIALS` set to `prod` or specify the target credential.
 
+If configuring a Rust skill, use `DeveloperToolsCredential` for local development and `ManagedIdentityCredential` for production. The Rust SDK does not support `DefaultAzureCredential`, so explicitly use the appropriate credential in each environment.
+
 ```python
 # Python
 from azure.identity import DefaultAzureCredential, ManagedIdentityCredential
@@ -154,6 +156,19 @@ const credential = new DefaultAzureCredential({
 // See https://learn.microsoft.com/javascript/api/overview/azure/identity-readme?view=azure-node-latest#credential-classes
 // const credential = new ManagedIdentityCredential();
 const client = new ServiceClient(endpoint, credential);
+```
+
+```rust
+// Rust
+use azure_identity::DeveloperToolsCredential;
+use azure_storage_blob::BlobServiceClient;
+
+let credential = DeveloperToolsCredential::new(); // Local dev
+let client = BlobServiceClient::new(
+    "https://<account>.blob.core.windows.net/",
+    credential,
+    None,
+)?;
 ```
 
 **Never hardcode credentials. Use environment variables.**

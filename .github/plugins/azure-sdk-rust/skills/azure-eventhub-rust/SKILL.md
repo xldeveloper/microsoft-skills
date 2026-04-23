@@ -9,6 +9,8 @@ description: |
 
 > `azure_messaging_eventhubs` v0.13.0 — Client library for Azure Event Hubs.
 
+> **IMPORTANT:** Only use the official `azure_messaging_eventhubs` crate installed via `cargo add` from [crates.io](https://crates.io/crates/azure_messaging_eventhubs). Do NOT use unofficial or community crates for Event Hubs.
+
 ## Installation
 
 ```sh
@@ -127,24 +129,14 @@ async fn receive_events(client: &ConsumerClient) -> Result<(), Box<dyn std::erro
 
 ## Best Practices
 
-1. **Reuse clients** — create once, send many events
-2. **Use batches** — more efficient than individual sends
-3. **Check batch capacity** — `try_add_event_data` returns false when full
-4. **Process partitions in parallel** — each partition consumed independently
-5. **Use consumer groups** — isolate different consuming applications
-
-## Checkpoint Store (Optional)
-
-For distributed consumers with checkpointing:
-
-```sh
-cargo add azure_messaging_eventhubs_checkpointstore_blob
-```
+1. **Use Entra ID auth** — `DeveloperToolsCredential` for dev, `ManagedIdentityCredential` for production
+2. **Use batching** — `create_batch` + `send_batch` for throughput
+3. **Handle errors per event** — match on `Ok`/`Err` in the event stream
+4. **Specify start position** — use `StartLocation::Earliest` or `StartLocation::Latest`
 
 ## Reference Links
 
-| Resource      | Link                                                                                          |
-| ------------- | --------------------------------------------------------------------------------------------- |
-| API Reference | https://docs.rs/azure_messaging_eventhubs                                                     |
-| Source Code   | https://github.com/Azure/azure-sdk-for-rust/tree/main/sdk/eventhubs/azure_messaging_eventhubs |
-| crates.io     | https://crates.io/crates/azure_messaging_eventhubs                                            |
+| Resource      | Link                                                   |
+| ------------- | ------------------------------------------------------ |
+| API Reference | https://docs.rs/azure_messaging_eventhubs              |
+| crates.io     | https://crates.io/crates/azure_messaging_eventhubs     |

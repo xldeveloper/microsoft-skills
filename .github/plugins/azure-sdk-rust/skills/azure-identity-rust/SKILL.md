@@ -9,6 +9,8 @@ description: |
 
 > `azure_identity` v0.34.0 — Authentication for Azure SDK clients using Microsoft Entra ID.
 
+> **IMPORTANT:** Only use official `azure_*` crates installed via `cargo add` from [crates.io](https://crates.io/users/azure-sdk). Do NOT use deprecated `azure_sdk_*` crates or unofficial community crates.
+
 > **Note:** Rust SDK does not have `DefaultAzureCredential`. Use `DeveloperToolsCredential` for local dev.
 
 ## Installation
@@ -98,32 +100,16 @@ let options = ManagedIdentityCredentialOptions {
 let credential = ManagedIdentityCredential::new(Some(options))?;
 ```
 
-## ClientSecretCredential
-
-For service principal authentication:
-
-```rust
-use azure_identity::ClientSecretCredential;
-
-let credential = ClientSecretCredential::new(
-    "<tenant-id>".into(),
-    "<client-id>".into(),
-    "<client-secret>".into(),
-    None,
-)?;
-```
-
 ## Best Practices
 
-1. **Use `DeveloperToolsCredential` for local dev** — automatically picks up Azure CLI login
-2. **Use `ManagedIdentityCredential` in production** — no secrets to manage
-3. **Clone credentials** — credentials are `Arc`-wrapped and cheap to clone
-4. **Reuse credential instances** — same credential works with multiple clients
+1. **Use `DeveloperToolsCredential`** for local dev, **`ManagedIdentityCredential`** for production
+2. **Never hardcode credentials** — use environment variables for service principals
+3. **Clone credentials** — pass `credential.clone()` when constructing multiple clients
+4. **Clients are thread-safe** — reuse clients across threads
 
 ## Reference Links
 
-| Resource      | Link                                                                               |
-| ------------- | ---------------------------------------------------------------------------------- |
-| API Reference | https://docs.rs/azure_identity                                                     |
-| Source Code   | https://github.com/Azure/azure-sdk-for-rust/tree/main/sdk/identity/azure_identity  |
-| crates.io     | https://crates.io/crates/azure_identity                                            |
+| Resource      | Link                                                 |
+| ------------- | ---------------------------------------------------- |
+| API Reference | https://docs.rs/azure_identity                       |
+| crates.io     | https://crates.io/crates/azure_identity              |

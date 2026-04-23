@@ -9,6 +9,8 @@ description: |
 
 > `azure_security_keyvault_secrets` v0.13.0 — Secure storage for passwords, API keys, and connection strings.
 
+> **IMPORTANT:** Only use the official `azure_security_keyvault_secrets` crate installed via `cargo add` from [crates.io](https://crates.io/crates/azure_security_keyvault_secrets). Do NOT use unofficial or community crates.
+
 ## Installation
 
 ```sh
@@ -118,31 +120,34 @@ while let Some(secret) = pager.try_next().await? {
 ## Error Handling
 
 ```rust
+use azure_core::{error::ErrorKind, http::StatusCode};
+
 match client.get_secret("secret-name", None).await {
-    Ok(response) => println!("Secret Value: {:?}", response.into_model()?.value),
-    Err(err) => println!("Error: {:#?}", err.into_inner()?),
+    Ok(response) => println!("Secret: {:?}", response.into_model()?.value),
+    Err(e) => match e.kind() {
+        ErrorKind::HttpResponse { status, error_code, .. }
+            if *status == StatusCode::NotFound =>
+        {
+            println!("Secret not found");
+            if let Some(code) = error_code {
+                println!("ErrorCode: {}", code);
+            }
+        }
+        _ => println!("Error: {e:?}"),
+    },
 }
 ```
-
-## RBAC Permissions
-
-| Role                       | Access       |
-| -------------------------- | ------------ |
-| `Key Vault Secrets User`   | Get and list |
-| `Key Vault Secrets Officer` | Full CRUD    |
 
 ## Best Practices
 
 1. **Use Entra ID auth** — `DeveloperToolsCredential` for dev, `ManagedIdentityCredential` for production
-2. **Use `into_model()?`** — to deserialize responses
-3. **Use `ResourceExt` trait** — for extracting names from resource IDs
-4. **Handle soft delete** — deleted secrets are recoverable within retention period
-5. **Use `try_into()?`** — to convert parameter structs for API calls
+2. **Use `..Default::default()`** — for struct update syntax on all model types
+3. **Use `ResourceExt`** — to extract resource name/version from secret IDs
+4. **Reuse clients** — `SecretClient` is thread-safe
 
 ## Reference Links
 
-| Resource      | Link                                                                                               |
-| ------------- | -------------------------------------------------------------------------------------------------- |
-| API Reference | https://docs.rs/azure_security_keyvault_secrets                                                    |
-| Source Code   | https://github.com/Azure/azure-sdk-for-rust/tree/main/sdk/keyvault/azure_security_keyvault_secrets |
-| crates.io     | https://crates.io/crates/azure_security_keyvault_secrets                                           |
+| Resource      | Link                                                          |
+| ------------- | ------------------------------------------------------------- |
+| API Reference | https://docs.rs/azure_security_keyvault_secrets               |
+| crates.io     | https://crates.io/crates/azure_security_keyvault_secrets      |

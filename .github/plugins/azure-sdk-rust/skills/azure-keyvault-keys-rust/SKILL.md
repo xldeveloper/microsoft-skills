@@ -9,6 +9,8 @@ description: |
 
 > `azure_security_keyvault_keys` v0.13.0 — Secure storage and management of cryptographic keys.
 
+> **IMPORTANT:** Only use the official `azure_security_keyvault_keys` crate installed via `cargo add` from [crates.io](https://crates.io/crates/azure_security_keyvault_keys). Do NOT use unofficial or community crates.
+
 ## Installation
 
 ```sh
@@ -159,37 +161,29 @@ let unwrapped = client
     .await?
     .into_model()?;
 
-assert!(matches!(unwrapped.result, Some(result) if result.eq(&dek)));
+assert_eq!(unwrapped.result.as_ref(), Some(&dek));
 ```
 
 ## Key Types
 
-| Type      | Description                               |
-| --------- | ----------------------------------------- |
-| `Rsa`     | RSA keys (2048, 3072, 4096 bits)          |
-| `Ec`      | Elliptic curve keys (P-256, P-384, P-521) |
-| `RsaHsm`  | HSM-protected RSA keys                    |
-| `EcHsm`   | HSM-protected EC keys                     |
-
-## RBAC Permissions
-
-| Role                      | Access                     |
-| ------------------------- | -------------------------- |
-| `Key Vault Crypto User`  | Use keys for crypto ops    |
-| `Key Vault Crypto Officer` | Full CRUD on keys          |
+| Type   | Use Case                      | Parameter           |
+| ------ | ----------------------------- | ------------------- |
+| EC     | Signing, key agreement        | `KeyType::Ec`       |
+| RSA    | Encryption, signing, wrapping | `KeyType::Rsa`      |
+| Oct    | Symmetric operations (HSM)    | `KeyType::Oct`      |
+| EC-HSM | HSM-protected EC keys         | `KeyType::EcHsm`   |
+| RSA-HSM| HSM-protected RSA keys        | `KeyType::RsaHsm`  |
 
 ## Best Practices
 
 1. **Use Entra ID auth** — `DeveloperToolsCredential` for dev, `ManagedIdentityCredential` for production
-2. **Use HSM keys for sensitive workloads** — hardware-protected keys
-3. **Use EC for signing** — more efficient than RSA
-4. **Use RSA for encryption** — when encrypting data
-5. **Use `ResourceExt`** — for extracting key names and versions from IDs
+2. **Use `..Default::default()`** — for struct update syntax on all model types
+3. **Use `ResourceExt`** — to extract key name/version from key IDs
+4. **Reuse clients** — `KeyClient` is thread-safe
 
 ## Reference Links
 
-| Resource      | Link                                                                                            |
-| ------------- | ----------------------------------------------------------------------------------------------- |
-| API Reference | https://docs.rs/azure_security_keyvault_keys                                                    |
-| Source Code   | https://github.com/Azure/azure-sdk-for-rust/tree/main/sdk/keyvault/azure_security_keyvault_keys |
-| crates.io     | https://crates.io/crates/azure_security_keyvault_keys                                           |
+| Resource      | Link                                                      |
+| ------------- | --------------------------------------------------------- |
+| API Reference | https://docs.rs/azure_security_keyvault_keys              |
+| crates.io     | https://crates.io/crates/azure_security_keyvault_keys     |

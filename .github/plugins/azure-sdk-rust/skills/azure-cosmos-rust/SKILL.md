@@ -9,6 +9,8 @@ description: |
 
 > `azure_data_cosmos` v0.32.0 — Client library for Azure Cosmos DB NoSQL API.
 
+> **IMPORTANT:** Only use the official `azure_data_cosmos` crate installed via `cargo add` from [crates.io](https://crates.io/crates/azure_data_cosmos). Do NOT use the unofficial `azure_cosmos` or `azure_sdk_for_rust` community crates.
+
 ## Installation
 
 ```sh
@@ -103,17 +105,14 @@ cargo add azure_data_cosmos --features key_auth
 
 ## Best Practices
 
-1. **Always specify partition key** — required for all point operations
-2. **Use `into_model()?`** — to deserialize responses into your types
-3. **Derive `Serialize` and `Deserialize`** — for all document types
-4. **Use Entra ID auth** — prefer `DeveloperToolsCredential` over key auth
-5. **`container_client()` is async** — requires `.await?`
-6. **Reuse client instances** — clients are thread-safe
+1. **Use Entra ID auth** — `DeveloperToolsCredential` for dev, `ManagedIdentityCredential` for production
+2. **Reuse `CosmosClient`** — clients are thread-safe; create once, share across threads
+3. **Use `RoutingStrategy::ProximityTo`** — route to the nearest region for lowest latency
+4. **Partition keys** — always specify partition key for item operations
 
 ## Reference Links
 
-| Resource      | Link                                                                               |
-| ------------- | ---------------------------------------------------------------------------------- |
-| API Reference | https://docs.rs/azure_data_cosmos                                                  |
-| Source Code   | https://github.com/Azure/azure-sdk-for-rust/tree/main/sdk/cosmos/azure_data_cosmos |
-| crates.io     | https://crates.io/crates/azure_data_cosmos                                         |
+| Resource      | Link                                                                      |
+| ------------- | ------------------------------------------------------------------------- |
+| API Reference | https://docs.rs/azure_data_cosmos                                         |
+| crates.io     | https://crates.io/crates/azure_data_cosmos                                |

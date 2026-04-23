@@ -2,7 +2,7 @@
 
 Reference for creating skills that teach agents to write code following official Azure SDK guidelines.
 
-**Official Documentation:** https://azure.github.io/azure-sdk/
+**Official Documentation:** <https://azure.github.io/azure-sdk/>
 
 ---
 
@@ -14,8 +14,9 @@ Reference for creating skills that teach agents to write code following official
 4. [.NET (C#) Patterns](#net-c-patterns)
 5. [Java Patterns](#java-patterns)
 6. [TypeScript/JavaScript Patterns](#typescriptjavascript-patterns)
-7. [Authentication (All Languages)](#authentication-all-languages)
-8. [Quick Reference Tables](#quick-reference-tables)
+7. [Rust Patterns](#rust-patterns)
+8. [Authentication (All Languages)](#authentication-all-languages)
+9. [Quick Reference Tables](#quick-reference-tables)
 
 ---
 
@@ -445,6 +446,165 @@ try {
 
 ---
 
+## Rust Patterns
+
+> **IMPORTANT:** Only use the official `azure_*` crates published by the [azure-sdk](https://crates.io/users/azure-sdk) crates.io user (e.g., `azure_core`, `azure_identity`, `azure_security_keyvault_secrets`). Do **NOT** use the deprecated unofficial crates (`azure_sdk_*` from MindFlavor/AzureSDKForRust) or the community crates (e.g., `azure_storage`, or `azure_storage_blobs` from the `azure_sdk_for_rust` ecosystem). The official crates use underscores in their names and are installed via `cargo add`. None of the official crates have a version number of 0.21.0.
+
+### Crate Naming
+
+```rust
+// Crate: azure_<group>_<service> (underscores, all lowercase)
+// Client: ServiceClient (PascalCase with Client suffix)
+// Options: ServiceClientOptions
+
+use azure_security_keyvault_secrets::{SecretClient, SecretClientOptions};
+```
+
+### Client Construction: `new()` Function
+
+Rust clients use a `new()` function (not builders) with optional `Options` struct:
+
+```rust
+use azure_identity::DeveloperToolsCredential;
+use azure_security_keyvault_secrets::{SecretClient, SecretClientOptions};
+
+let credential = DeveloperToolsCredential::new(None)?;
+
+let options = SecretClientOptions {
+    api_version: "7.5".to_string(),
+    ..Default::default()
+};
+
+let client = SecretClient::new(
+    "https://my-vault.vault.azure.net/",
+    credential.clone(),
+    Some(options),
+)?;
+```
+
+### Response Wrapper: `Response<T>`
+
+```rust
+// Call a service method returning Response<T>
+let response = client.get_secret("secret-name", None).await?;
+
+// Deserialize into a model
+let secret = response.into_model()?;
+
+// Or deconstruct for HTTP details
+let (status, headers, body) = response.deconstruct();
+```
+
+### Pagination: `Pager<T>`
+
+```rust
+use futures::TryStreamExt as _;
+
+// Iterate all items across all pages
+let mut pager = client.list_secret_properties(None)?;
+while let Some(secret) = pager.try_next().await? {
+    println!("Found: {}", secret.resource_id()?.name);
+}
+
+// Iterate page by page
+let mut pager = client.list_secret_properties(None)?.into_pages();
+while let Some(page) = pager.try_next().await? {
+    for secret in page.into_model()?.value {
+        println!("Found: {}", secret.resource_id()?.name);
+    }
+}
+```
+
+### Long-Running Operations: `Poller<T>`
+
+```rust
+// Poller implements IntoFuture — just await it
+let certificate = client
+    .create_certificate("cert-name", body.try_into()?, None)?
+    .await?
+    .into_model()?;
+
+// Or iterate status updates via futures::Stream
+use futures::stream::TryStreamExt as _;
+
+let mut poller = client.create_certificate("cert-name", body.try_into()?, None)?;
+while let Some(operation) = poller.try_next().await? {
+    let operation = operation.into_model()?;
+    match operation.status.as_deref().unwrap_or("unknown") {
+        "inProgress" => continue,
+        "completed" => break,
+        status => Err(format!("operation terminated with status {status}"))?,
+    }
+}
+```
+
+### Error Handling
+
+```rust
+use azure_core::{error::ErrorKind, http::StatusCode};
+
+match client.get_secret("secret-name", None).await {
+    Ok(response) => println!("Secret: {:?}", response.into_model()?.value),
+    Err(e) => match e.kind() {
+        ErrorKind::HttpResponse { status, error_code, .. }
+            if *status == StatusCode::NotFound =>
+        {
+            println!("Not found");
+            if let Some(code) = error_code {
+                println!("ErrorCode: {}", code);
+            }
+        }
+        _ => println!("Error: {e:?}"),
+    },
+}
+```
+
+### Model Types
+
+```rust
+use azure_core::fmt::SafeDebug;
+
+// Request/response models: Clone + Default + Serialize/Deserialize
+// All non-vector fields are Option<T>
+// Response-only models are #[non_exhaustive]
+// Use ..Default::default() for struct update syntax
+#[allow(clippy::needless_update)]
+let parameters = UpdateSecretPropertiesParameters {
+    content_type: Some("text/plain".into()),
+    secret_attributes: None,
+    tags: Some(tags),
+    ..Default::default()
+};
+```
+
+### Async Only
+
+The Rust SDK provides **only async** methods. No sync wrappers:
+
+```rust
+#[tokio::main]
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let credential = DeveloperToolsCredential::new(None)?;
+    let client = SecretClient::new(endpoint, credential.clone(), None)?;
+    let secret = client.get_secret("name", None).await?.into_model()?;
+    Ok(())
+}
+```
+
+### Key Differences from Other Azure SDKs
+
+| Aspect | Rust | Other Languages |
+|--------|------|----------------|
+| Auth default | `DeveloperToolsCredential` | `DefaultAzureCredential` |
+| Client creation | `Client::new()` function | Constructors or builders |
+| Sync support | Async only | Sync + Async |
+| Options | `Option<ClientOptions>` param | Separate options class |
+| Response access | `response.into_model()?` | Direct return or `.Value` |
+| Debug safety | `SafeDebug` derive (redacts PII) | Standard debug |
+| Pagination stream | `futures::TryStreamExt` | Language iterators |
+
+---
+
 ## Authentication (All Languages)
 
 **Always use `DefaultAzureCredential` as the primary pattern:**
@@ -482,7 +642,19 @@ const credential = new DefaultAzureCredential();
 const client = new ServiceClient(endpoint, credential);
 ```
 
+### Rust
+
+```rust
+use azure_identity::DeveloperToolsCredential;
+
+let credential = DeveloperToolsCredential::new(None)?;
+let client = ServiceClient::new(endpoint, credential.clone(), None)?;
+```
+
+> **Note:** Rust does not have `DefaultAzureCredential`. Use `DeveloperToolsCredential` for development (tries Azure CLI, then Azure Developer CLI). Use `ManagedIdentityCredential` for production on Azure-hosted apps.
+
 **Rules:**
+
 - Never hardcode credentials
 - Never persist/cache tokens manually (credential handles refresh)
 - Use environment variables for configuration
@@ -493,11 +665,11 @@ const client = new ServiceClient(endpoint, credential);
 
 ### Client Types by Language
 
-| Pattern | Python | .NET | Java | TypeScript |
-|---------|--------|------|------|------------|
-| Sync Client | `Client` | `Client` | `Client` | `Client` |
-| Async Client | `AsyncClient` | N/A (Async methods) | `AsyncClient` | N/A (Promise) |
-| Builder | N/A | N/A | `ClientBuilder` | N/A |
+| Pattern | Python | .NET | Java | TypeScript | Rust |
+|---------|--------|------|------|------------|------|
+| Sync Client | `Client` | `Client` | `Client` | `Client` | N/A (Async only) |
+| Async Client | `AsyncClient` | N/A (Async methods) | `AsyncClient` | N/A (Promise) | `Client` |
+| Builder | N/A | N/A | `ClientBuilder` | N/A | N/A (`new()` fn) |
 
 ### Pagination Types
 
@@ -507,6 +679,7 @@ const client = new ServiceClient(endpoint, credential);
 | .NET | `Pageable<T>` | `AsyncPageable<T>` |
 | Java | `PagedIterable<T>` | `PagedFlux<T>` |
 | TypeScript | N/A | `PagedAsyncIterableIterator<T>` |
+| Rust | N/A | `Pager<T>` (via `futures::TryStreamExt`) |
 
 ### LRO Types
 
@@ -516,6 +689,7 @@ const client = new ServiceClient(endpoint, credential);
 | .NET | `Operation<T>` | `Operation<T>` |
 | Java | `SyncPoller<T,U>` | `PollerFlux<T,U>` |
 | TypeScript | N/A | `PollerLike<T>` |
+| Rust | N/A | `Poller<T>` (implements `IntoFuture` + `Stream`) |
 
 ### Response Wrappers
 
@@ -525,15 +699,17 @@ const client = new ServiceClient(endpoint, credential);
 | .NET | `Response<T>` | `Pageable<T>` |
 | Java | Direct return | `PagedIterable<T>` |
 | TypeScript | `Promise<T>` | `PagedAsyncIterableIterator<T>` |
+| Rust | `Response<T>` | `Pager<T>` |
 
 ---
 
 ## Official Documentation Links
 
-- **General Guidelines:** https://azure.github.io/azure-sdk/general_introduction.html
-- **Python:** https://azure.github.io/azure-sdk/python_design.html
-- **.NET:** https://azure.github.io/azure-sdk/dotnet_introduction.html
-- **Java:** https://azure.github.io/azure-sdk/java_introduction.html
-- **TypeScript:** https://azure.github.io/azure-sdk/typescript_introduction.html
+- **General Guidelines:** <https://azure.github.io/azure-sdk/general_introduction.html>
+- **Python:** <https://azure.github.io/azure-sdk/python_design.html>
+- **.NET:** <https://azure.github.io/azure-sdk/dotnet_introduction.html>
+- **Java:** <https://azure.github.io/azure-sdk/java_introduction.html>
+- **TypeScript:** <https://azure.github.io/azure-sdk/typescript_introduction.html>
+- **Rust:** <https://azure.github.io/azure-sdk/rust_introduction.html>
 
 When creating Azure SDK skills, reference these docs via the `microsoft-docs` MCP for current API signatures.
