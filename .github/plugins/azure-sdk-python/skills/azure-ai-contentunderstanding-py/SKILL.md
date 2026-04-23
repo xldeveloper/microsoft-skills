@@ -23,7 +23,7 @@ pip install azure-ai-contentunderstanding
 ## Environment Variables
 
 ```bash
-CONTENTUNDERSTANDING_ENDPOINT=https://<resource>.cognitiveservices.azure.com/
+CONTENTUNDERSTANDING_ENDPOINT=https://<resource>.cognitiveservices.azure.com/  # Required for all auth methods
 AZURE_TOKEN_CREDENTIALS=prod # Required only if DefaultAzureCredential is used in production
 ```
 

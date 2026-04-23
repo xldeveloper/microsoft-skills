@@ -23,8 +23,8 @@ pip install azure-ai-textanalytics
 ## Environment Variables
 
 ```bash
-AZURE_LANGUAGE_ENDPOINT=https://<resource>.cognitiveservices.azure.com
-AZURE_LANGUAGE_KEY=<your-api-key>  # If using API key
+AZURE_LANGUAGE_ENDPOINT=https://<resource>.cognitiveservices.azure.com  # Required for all auth methods
+AZURE_LANGUAGE_KEY=<your-api-key>  # Only required for AzureKeyCredential auth
 AZURE_TOKEN_CREDENTIALS=prod # Required only if DefaultAzureCredential is used in production
 ```
 

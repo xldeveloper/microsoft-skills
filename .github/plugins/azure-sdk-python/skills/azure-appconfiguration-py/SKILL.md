@@ -23,9 +23,9 @@ pip install azure-appconfiguration
 ## Environment Variables
 
 ```bash
-AZURE_APPCONFIGURATION_CONNECTION_STRING=Endpoint=https://<name>.azconfig.io;Id=...;Secret=...
+AZURE_APPCONFIGURATION_CONNECTION_STRING=Endpoint=https://<name>.azconfig.io;Id=...;Secret=...  # Alternative to Entra ID auth
 # Or for Entra ID:
-AZURE_APPCONFIGURATION_ENDPOINT=https://<name>.azconfig.io
+AZURE_APPCONFIGURATION_ENDPOINT=https://<name>.azconfig.io  # Required for Entra ID auth
 AZURE_TOKEN_CREDENTIALS=prod # Required only if DefaultAzureCredential is used in production
 ```
 

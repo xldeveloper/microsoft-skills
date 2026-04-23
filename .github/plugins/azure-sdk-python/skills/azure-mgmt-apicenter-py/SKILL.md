@@ -24,7 +24,7 @@ pip install azure-identity
 ## Environment Variables
 
 ```bash
-AZURE_SUBSCRIPTION_ID=your-subscription-id
+AZURE_SUBSCRIPTION_ID=your-subscription-id  # Required for all auth methods
 AZURE_TOKEN_CREDENTIALS=prod # Required only if DefaultAzureCredential is used in production
 ```
 

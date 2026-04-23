@@ -21,9 +21,9 @@ pip install azure-ai-voicelive aiohttp azure-identity
 ## Environment Variables
 
 ```bash
-AZURE_COGNITIVE_SERVICES_ENDPOINT=https://<region>.api.cognitive.microsoft.com
+AZURE_COGNITIVE_SERVICES_ENDPOINT=https://<region>.api.cognitive.microsoft.com  # Required for all auth methods
 # For API key auth (not recommended for production)
-AZURE_COGNITIVE_SERVICES_KEY=<api-key>
+AZURE_COGNITIVE_SERVICES_KEY=<api-key>  # Only required for AzureKeyCredential auth
 AZURE_TOKEN_CREDENTIALS=prod # Required only if DefaultAzureCredential is used in production
 ```
 

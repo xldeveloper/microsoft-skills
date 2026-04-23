@@ -27,8 +27,8 @@ pip install azure-messaging-webpubsubclient
 ## Environment Variables
 
 ```bash
-AZURE_WEBPUBSUB_CONNECTION_STRING=Endpoint=https://<name>.webpubsub.azure.com;AccessKey=...
-AZURE_WEBPUBSUB_HUB=my-hub
+AZURE_WEBPUBSUB_CONNECTION_STRING=Endpoint=https://<name>.webpubsub.azure.com;AccessKey=...  # Alternative to Entra ID auth
+AZURE_WEBPUBSUB_HUB=my-hub  # Required for all auth methods
 AZURE_TOKEN_CREDENTIALS=prod # Required only if DefaultAzureCredential is used in production
 ```
 

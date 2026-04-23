@@ -23,12 +23,11 @@ pip install azure-ai-translation-document
 ## Environment Variables
 
 ```bash
-AZURE_DOCUMENT_TRANSLATION_ENDPOINT=https://<resource>.cognitiveservices.azure.com
-AZURE_DOCUMENT_TRANSLATION_KEY=<your-api-key>  # If using API key
-
+AZURE_DOCUMENT_TRANSLATION_ENDPOINT=https://<resource>.cognitiveservices.azure.com  # Required for all auth methods
+AZURE_DOCUMENT_TRANSLATION_KEY=<your-api-key>  # Only required for AzureKeyCredential auth
 # Storage for source and target documents
-AZURE_SOURCE_CONTAINER_URL=https://<storage>.blob.core.windows.net/<container>?<sas>
-AZURE_TARGET_CONTAINER_URL=https://<storage>.blob.core.windows.net/<container>?<sas>
+AZURE_SOURCE_CONTAINER_URL=https://<storage>.blob.core.windows.net/<container>?<sas>  # Required for all auth methods
+AZURE_TARGET_CONTAINER_URL=https://<storage>.blob.core.windows.net/<container>?<sas>  # Required for all auth methods
 AZURE_TOKEN_CREDENTIALS=prod # Required only if DefaultAzureCredential is used in production
 ```
 

@@ -25,13 +25,13 @@ pip install azure-identity
 
 ```bash
 # Data Collection Endpoint (DCE)
-AZURE_DCE_ENDPOINT=https://<dce-name>.<region>.ingest.monitor.azure.com
+AZURE_DCE_ENDPOINT=https://<dce-name>.<region>.ingest.monitor.azure.com  # Required for all auth methods
 
 # Data Collection Rule (DCR) immutable ID
-AZURE_DCR_RULE_ID=dcr-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+AZURE_DCR_RULE_ID=dcr-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx  # Required for all auth methods
 
 # Stream name from DCR
-AZURE_DCR_STREAM_NAME=Custom-MyTable_CL
+AZURE_DCR_STREAM_NAME=Custom-MyTable_CL  # Required for all auth methods
 AZURE_TOKEN_CREDENTIALS=prod # Required only if DefaultAzureCredential is used in production
 ```
 

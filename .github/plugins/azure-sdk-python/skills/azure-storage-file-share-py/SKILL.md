@@ -22,9 +22,9 @@ pip install azure-storage-file-share
 ## Environment Variables
 
 ```bash
-AZURE_STORAGE_CONNECTION_STRING=DefaultEndpointsProtocol=https;AccountName=...;AccountKey=...
+AZURE_STORAGE_CONNECTION_STRING=DefaultEndpointsProtocol=https;AccountName=...;AccountKey=...  # Alternative to Entra ID auth
 # Or
-AZURE_STORAGE_ACCOUNT_URL=https://<account>.file.core.windows.net
+AZURE_STORAGE_ACCOUNT_URL=https://<account>.file.core.windows.net  # Required for Entra ID auth
 AZURE_TOKEN_CREDENTIALS=prod # Required only if DefaultAzureCredential is used in production
 ```
 

@@ -24,10 +24,10 @@ pip install azure-monitor-query
 
 ```bash
 # Log Analytics
-AZURE_LOG_ANALYTICS_WORKSPACE_ID=<workspace-id>
+AZURE_LOG_ANALYTICS_WORKSPACE_ID=<workspace-id>  # Required for log queries
 
 # Metrics
-AZURE_METRICS_RESOURCE_URI=/subscriptions/<sub>/resourceGroups/<rg>/providers/<provider>/<type>/<name>
+AZURE_METRICS_RESOURCE_URI=/subscriptions/<sub>/resourceGroups/<rg>/providers/<provider>/<type>/<name>  # Required for metric queries
 AZURE_TOKEN_CREDENTIALS=prod # Required only if DefaultAzureCredential is used in production
 ```
 

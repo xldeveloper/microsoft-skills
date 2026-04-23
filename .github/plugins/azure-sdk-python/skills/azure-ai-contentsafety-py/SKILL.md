@@ -23,8 +23,8 @@ pip install azure-ai-contentsafety
 ## Environment Variables
 
 ```bash
-CONTENT_SAFETY_ENDPOINT=https://<resource>.cognitiveservices.azure.com
-CONTENT_SAFETY_KEY=<your-api-key>
+CONTENT_SAFETY_ENDPOINT=https://<resource>.cognitiveservices.azure.com  # Required for all auth methods
+CONTENT_SAFETY_KEY=<your-api-key>  # Only required for AzureKeyCredential auth
 AZURE_TOKEN_CREDENTIALS=prod # Required only if DefaultAzureCredential is used in production
 ```
 

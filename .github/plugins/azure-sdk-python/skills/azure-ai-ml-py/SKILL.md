@@ -23,9 +23,9 @@ pip install azure-ai-ml
 ## Environment Variables
 
 ```bash
-AZURE_SUBSCRIPTION_ID=<your-subscription-id>
-AZURE_RESOURCE_GROUP=<your-resource-group>
-AZURE_ML_WORKSPACE_NAME=<your-workspace-name>
+AZURE_SUBSCRIPTION_ID=<your-subscription-id>  # Required for all auth methods
+AZURE_RESOURCE_GROUP=<your-resource-group>  # Required for all auth methods
+AZURE_ML_WORKSPACE_NAME=<your-workspace-name>  # Required for all auth methods
 AZURE_TOKEN_CREDENTIALS=prod # Required only if DefaultAzureCredential is used in production
 ```
 

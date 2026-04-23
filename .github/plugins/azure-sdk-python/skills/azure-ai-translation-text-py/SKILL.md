@@ -23,10 +23,10 @@ pip install azure-ai-translation-text
 ## Environment Variables
 
 ```bash
-AZURE_TRANSLATOR_KEY=<your-api-key>
-AZURE_TRANSLATOR_REGION=<your-region>  # e.g., eastus, westus2
+AZURE_TRANSLATOR_KEY=<your-api-key>  # Only required for AzureKeyCredential auth
+AZURE_TRANSLATOR_REGION=<your-region>  # e.g., eastus, westus2; required with API key auth
 # Or use custom endpoint
-AZURE_TRANSLATOR_ENDPOINT=https://<resource>.cognitiveservices.azure.com
+AZURE_TRANSLATOR_ENDPOINT=https://<resource>.cognitiveservices.azure.com  # Required for Entra ID auth
 AZURE_TOKEN_CREDENTIALS=prod # Required only if DefaultAzureCredential is used in production
 ```
 

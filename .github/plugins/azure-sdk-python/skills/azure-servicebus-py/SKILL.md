@@ -23,10 +23,10 @@ pip install azure-servicebus azure-identity
 ## Environment Variables
 
 ```bash
-SERVICEBUS_FULLY_QUALIFIED_NAMESPACE=<namespace>.servicebus.windows.net
-SERVICEBUS_QUEUE_NAME=myqueue
-SERVICEBUS_TOPIC_NAME=mytopic
-SERVICEBUS_SUBSCRIPTION_NAME=mysubscription
+SERVICEBUS_FULLY_QUALIFIED_NAMESPACE=<namespace>.servicebus.windows.net  # Required for all auth methods
+SERVICEBUS_QUEUE_NAME=myqueue  # Required for queue operations
+SERVICEBUS_TOPIC_NAME=mytopic  # Required for topic operations
+SERVICEBUS_SUBSCRIPTION_NAME=mysubscription  # Required for subscription operations
 AZURE_TOKEN_CREDENTIALS=prod # Required only if DefaultAzureCredential is used in production
 ```
 

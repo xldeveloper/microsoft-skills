@@ -103,7 +103,7 @@ Follow this structure (based on existing Azure SDK skills):
 
 1. **Title** — `# SDK Name`
 2. **Installation** — `pip install`, `npm install`, etc.
-3. **Environment Variables** — Required configuration. If using `DefaultAzureCredential`in production,include `AZURE_TOKEN_CREDENTIALS` (set to `prod` or `<specific_credential>`)
+3. **Environment Variables** — Required configuration, with an inline comment explaining when it's required . If using `DefaultAzureCredential`in production,include `AZURE_TOKEN_CREDENTIALS` (set to `prod` or `<specific_credential>`)
 4. **Authentication** — Use a specific Microsoft Entra Token credential like `ManagedIdentityCredential` or `WorkloadIdentityCredential` for production. `DefaultAzureCredential` is only recommended for local development. To use DefaultAzureCredential in production, set the environment variable `AZURE_TOKEN_CREDENTIALS` to `prod` or the specific target credential.
 5. **Core Workflow** — Minimal viable example
 6. **Feature Tables** — Clients, methods, tools

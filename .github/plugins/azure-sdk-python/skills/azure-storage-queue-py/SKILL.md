@@ -23,7 +23,7 @@ pip install azure-storage-queue azure-identity
 ## Environment Variables
 
 ```bash
-AZURE_STORAGE_ACCOUNT_URL=https://<account>.queue.core.windows.net
+AZURE_STORAGE_ACCOUNT_URL=https://<account>.queue.core.windows.net  # Required for all auth methods
 AZURE_TOKEN_CREDENTIALS=prod # Required only if DefaultAzureCredential is used in production
 ```
 

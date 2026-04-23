@@ -23,9 +23,9 @@ pip install azure-cosmos azure-identity
 ## Environment Variables
 
 ```bash
-COSMOS_ENDPOINT=https://<account>.documents.azure.com:443/
-COSMOS_DATABASE=mydb
-COSMOS_CONTAINER=mycontainer
+COSMOS_ENDPOINT=https://<account>.documents.azure.com:443/  # Required for all auth methods
+COSMOS_DATABASE=mydb  # Required for all auth methods
+COSMOS_CONTAINER=mycontainer  # Required for all auth methods
 AZURE_TOKEN_CREDENTIALS=prod # Required only if DefaultAzureCredential is used in production
 ```
 

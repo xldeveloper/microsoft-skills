@@ -24,10 +24,10 @@ pip install azure-data-tables azure-identity
 
 ```bash
 # Azure Storage Tables
-AZURE_STORAGE_ACCOUNT_URL=https://<account>.table.core.windows.net
+AZURE_STORAGE_ACCOUNT_URL=https://<account>.table.core.windows.net  # Required for Azure Storage Tables
 
 # Cosmos DB Table API
-COSMOS_TABLE_ENDPOINT=https://<account>.table.cosmos.azure.com
+COSMOS_TABLE_ENDPOINT=https://<account>.table.cosmos.azure.com  # Required for Cosmos DB Table API
 AZURE_TOKEN_CREDENTIALS=prod # Required only if DefaultAzureCredential is used in production
 ```
 

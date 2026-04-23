@@ -23,8 +23,8 @@ pip install azure-ai-vision-imageanalysis
 ## Environment Variables
 
 ```bash
-VISION_ENDPOINT=https://<resource>.cognitiveservices.azure.com
-VISION_KEY=<your-api-key>  # If using API key
+VISION_ENDPOINT=https://<resource>.cognitiveservices.azure.com  # Required for all auth methods
+VISION_KEY=<your-api-key>  # Only required for AzureKeyCredential auth
 AZURE_TOKEN_CREDENTIALS=prod # Required only if DefaultAzureCredential is used in production
 ```
 

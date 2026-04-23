@@ -23,9 +23,9 @@ pip install azure-search-documents
 ## Environment Variables
 
 ```bash
-AZURE_SEARCH_ENDPOINT=https://<service-name>.search.windows.net
-AZURE_SEARCH_API_KEY=<your-api-key>
-AZURE_SEARCH_INDEX_NAME=<your-index-name>
+AZURE_SEARCH_ENDPOINT=https://<service-name>.search.windows.net  # Required for all auth methods
+AZURE_SEARCH_API_KEY=<your-api-key>  # Only required for AzureKeyCredential auth
+AZURE_SEARCH_INDEX_NAME=<your-index-name>  # Required for all auth methods
 ```
 
 ## Authentication
@@ -335,10 +335,10 @@ pip install azure-search-documents azure-identity
 ## Environment Variables
 
 ```bash
-AZURE_SEARCH_ENDPOINT=https://<search-service>.search.windows.net
-AZURE_SEARCH_INDEX_NAME=<index-name>
+AZURE_SEARCH_ENDPOINT=https://<search-service>.search.windows.net  # Required for all auth methods
+AZURE_SEARCH_INDEX_NAME=<index-name>  # Required for all auth methods
 # For API key auth (not recommended for production)
-AZURE_SEARCH_API_KEY=<api-key>
+AZURE_SEARCH_API_KEY=<api-key>  # Only required for AzureKeyCredential auth
 AZURE_TOKEN_CREDENTIALS=prod # Required only if DefaultAzureCredential is used in production
 ```
 

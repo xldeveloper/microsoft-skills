@@ -25,10 +25,10 @@ pip install azure-eventhub-checkpointstoreblob-aio
 ## Environment Variables
 
 ```bash
-EVENT_HUB_FULLY_QUALIFIED_NAMESPACE=<namespace>.servicebus.windows.net
-EVENT_HUB_NAME=my-eventhub
-STORAGE_ACCOUNT_URL=https://<account>.blob.core.windows.net
-CHECKPOINT_CONTAINER=checkpoints
+EVENT_HUB_FULLY_QUALIFIED_NAMESPACE=<namespace>.servicebus.windows.net  # Required for all auth methods
+EVENT_HUB_NAME=my-eventhub  # Required for all auth methods
+STORAGE_ACCOUNT_URL=https://<account>.blob.core.windows.net  # Required for checkpoint storage
+CHECKPOINT_CONTAINER=checkpoints  # Required for checkpoint storage
 AZURE_TOKEN_CREDENTIALS=prod # Required only if DefaultAzureCredential is used in production
 ```
 

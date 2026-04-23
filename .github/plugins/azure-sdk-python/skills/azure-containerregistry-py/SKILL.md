@@ -23,7 +23,7 @@ pip install azure-containerregistry
 ## Environment Variables
 
 ```bash
-AZURE_CONTAINERREGISTRY_ENDPOINT=https://<registry-name>.azurecr.io
+AZURE_CONTAINERREGISTRY_ENDPOINT=https://<registry-name>.azurecr.io  # Required for all auth methods
 AZURE_TOKEN_CREDENTIALS=prod # Required only if DefaultAzureCredential is used in production
 ```
 

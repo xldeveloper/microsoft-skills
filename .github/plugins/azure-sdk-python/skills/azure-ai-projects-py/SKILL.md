@@ -21,8 +21,8 @@ pip install azure-ai-projects azure-identity
 ## Environment Variables
 
 ```bash
-AZURE_AI_PROJECT_ENDPOINT="https://<resource>.services.ai.azure.com/api/projects/<project>"
-AZURE_AI_MODEL_DEPLOYMENT_NAME="gpt-4o-mini"
+AZURE_AI_PROJECT_ENDPOINT="https://<resource>.services.ai.azure.com/api/projects/<project>"  # Required for all auth methods
+AZURE_AI_MODEL_DEPLOYMENT_NAME="gpt-4o-mini"  # Required for all auth methods
 AZURE_TOKEN_CREDENTIALS=prod # Required only if DefaultAzureCredential is used in production
 ```
 
