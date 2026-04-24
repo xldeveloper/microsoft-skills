@@ -1,65 +1,16 @@
-# Azure Document Intelligence (Form Recognizer) Java SDK - Examples
+# Azure AI Document Intelligence - Java Code Examples
 
-Comprehensive code examples for the Azure AI Document Intelligence SDK for Java.
+## 1. Client Setup
 
-## Table of Contents
-
-- [Maven Dependency](#maven-dependency)
-- [Client Creation](#client-creation)
-- [Prebuilt Models](#prebuilt-models)
-- [Layout Analysis](#layout-analysis)
-- [Receipt Analysis](#receipt-analysis)
-- [Invoice Analysis](#invoice-analysis)
-- [ID Document Analysis](#id-document-analysis)
-- [Custom Models](#custom-models)
-- [Document Classification](#document-classification)
-- [Model Management](#model-management)
-- [Async Patterns](#async-patterns)
-- [Error Handling](#error-handling)
-- [Complete Application Example](#complete-application-example)
-
-## Maven Dependency
-
-```xml
-<dependency>
-    <groupId>com.azure</groupId>
-    <artifactId>azure-ai-formrecognizer</artifactId>
-    <version>4.2.0-beta.1</version>
-</dependency>
-
-<!-- For DefaultAzureCredential -->
-<dependency>
-    <groupId>com.azure</groupId>
-    <artifactId>azure-identity</artifactId>
-    <version>1.14.2</version>
-</dependency>
-```
-
-## Client Creation
-
-### With API Key
+### Sync Client with DefaultAzureCredential
 
 ```java
-import com.azure.ai.formrecognizer.documentanalysis.DocumentAnalysisClient;
-import com.azure.ai.formrecognizer.documentanalysis.DocumentAnalysisClientBuilder;
-import com.azure.core.credential.AzureKeyCredential;
-
-String endpoint = System.getenv("FORM_RECOGNIZER_ENDPOINT");
-String key = System.getenv("FORM_RECOGNIZER_KEY");
-
-DocumentAnalysisClient client = new DocumentAnalysisClientBuilder()
-    .credential(new AzureKeyCredential(key))
-    .endpoint(endpoint)
-    .buildClient();
-```
-
-### With DefaultAzureCredential (Recommended)
-
-```java
+import com.azure.ai.documentintelligence.DocumentIntelligenceClient;
+import com.azure.ai.documentintelligence.DocumentIntelligenceClientBuilder;
 import com.azure.identity.DefaultAzureCredentialBuilder;
 
-DocumentAnalysisClient client = new DocumentAnalysisClientBuilder()
-    .endpoint(endpoint)
+DocumentIntelligenceClient client = new DocumentIntelligenceClientBuilder()
+    .endpoint(System.getenv("DOCUMENT_INTELLIGENCE_ENDPOINT"))
     .credential(new DefaultAzureCredentialBuilder().build())
     .buildClient();
 ```
@@ -67,10 +18,10 @@ DocumentAnalysisClient client = new DocumentAnalysisClientBuilder()
 ### Async Client
 
 ```java
-import com.azure.ai.formrecognizer.documentanalysis.DocumentAnalysisAsyncClient;
+import com.azure.ai.documentintelligence.DocumentIntelligenceAsyncClient;
 
-DocumentAnalysisAsyncClient asyncClient = new DocumentAnalysisClientBuilder()
-    .endpoint(endpoint)
+DocumentIntelligenceAsyncClient asyncClient = new DocumentIntelligenceClientBuilder()
+    .endpoint(System.getenv("DOCUMENT_INTELLIGENCE_ENDPOINT"))
     .credential(new DefaultAzureCredentialBuilder().build())
     .buildAsyncClient();
 ```
@@ -78,374 +29,346 @@ DocumentAnalysisAsyncClient asyncClient = new DocumentAnalysisClientBuilder()
 ### Administration Client
 
 ```java
-import com.azure.ai.formrecognizer.documentanalysis.administration.DocumentModelAdministrationClient;
-import com.azure.ai.formrecognizer.documentanalysis.administration.DocumentModelAdministrationClientBuilder;
+import com.azure.ai.documentintelligence.DocumentIntelligenceAdministrationClient;
+import com.azure.ai.documentintelligence.DocumentIntelligenceAdministrationClientBuilder;
 
-DocumentModelAdministrationClient adminClient = new DocumentModelAdministrationClientBuilder()
-    .endpoint(endpoint)
+DocumentIntelligenceAdministrationClient adminClient = new DocumentIntelligenceAdministrationClientBuilder()
+    .endpoint(System.getenv("DOCUMENT_INTELLIGENCE_ENDPOINT"))
     .credential(new DefaultAzureCredentialBuilder().build())
     .buildClient();
 ```
 
-## Prebuilt Models
+---
 
-| Model ID | Purpose |
-|----------|---------|
-| `prebuilt-layout` | Extract text, tables, selection marks |
-| `prebuilt-document` | General document with key-value pairs |
-| `prebuilt-receipt` | Receipt data extraction |
-| `prebuilt-invoice` | Invoice field extraction |
-| `prebuilt-businessCard` | Business card parsing |
-| `prebuilt-idDocument` | ID document (passport, license) |
-| `prebuilt-tax.us.w2` | US W2 tax forms |
+## 2. Analyze Layout
 
-## Layout Analysis
-
-### Extract Layout from File
+### From Local File
 
 ```java
-import com.azure.ai.formrecognizer.documentanalysis.models.*;
+import com.azure.ai.documentintelligence.models.*;
 import com.azure.core.util.BinaryData;
 import com.azure.core.util.polling.SyncPoller;
 import java.io.File;
 
-File document = new File("document.pdf");
-BinaryData documentData = BinaryData.fromFile(document.toPath());
+File layoutDocument = new File("document.pdf");
+BinaryData documentData = BinaryData.fromFile(
+    layoutDocument.toPath(), (int) layoutDocument.length());
 
-SyncPoller<OperationResult, AnalyzeResult> poller = 
-    client.beginAnalyzeDocument("prebuilt-layout", documentData);
+SyncPoller<AnalyzeOperationDetails, AnalyzeResult> poller =
+    client.beginAnalyzeDocument("prebuilt-layout",
+        new AnalyzeDocumentOptions(documentData));
 
 AnalyzeResult result = poller.getFinalResult();
 
-// Process pages
+// Pages
 for (DocumentPage page : result.getPages()) {
     System.out.printf("Page %d: %.2f x %.2f %s%n",
-        page.getPageNumber(),
-        page.getWidth(),
-        page.getHeight(),
-        page.getUnit());
-    
-    // Extract lines
+        page.getPageNumber(), page.getWidth(), page.getHeight(), page.getUnit());
+
+    // Lines
     for (DocumentLine line : page.getLines()) {
-        System.out.println("Line: " + line.getContent());
+        System.out.printf("  Line: '%s' [%s]%n",
+            line.getContent(), line.getPolygon());
     }
-    
-    // Extract words with confidence
+
+    // Words
     for (DocumentWord word : page.getWords()) {
-        System.out.printf("Word: '%s' (confidence: %.2f)%n",
-            word.getContent(),
-            word.getConfidence());
+        System.out.printf("  Word: '%s' (confidence: %.2f)%n",
+            word.getContent(), word.getConfidence());
     }
-    
-    // Selection marks (checkboxes)
+
+    // Selection marks
     for (DocumentSelectionMark mark : page.getSelectionMarks()) {
-        System.out.printf("Checkbox: %s (confidence: %.2f)%n",
-            mark.getSelectionMarkState(),
-            mark.getConfidence());
+        System.out.printf("  Selection mark: %s (confidence: %.2f)%n",
+            mark.getState(), mark.getConfidence());
     }
 }
 
-// Process tables
-for (DocumentTable table : result.getTables()) {
-    System.out.printf("Table: %d rows x %d columns%n",
-        table.getRowCount(),
-        table.getColumnCount());
-    
+// Tables
+for (int i = 0; i < result.getTables().size(); i++) {
+    DocumentTable table = result.getTables().get(i);
+    System.out.printf("Table %d: %d rows x %d columns%n",
+        i, table.getRowCount(), table.getColumnCount());
     for (DocumentTableCell cell : table.getCells()) {
-        System.out.printf("Cell[%d,%d]: %s%n",
-            cell.getRowIndex(),
-            cell.getColumnIndex(),
-            cell.getContent());
+        System.out.printf("  Cell[%d,%d]: '%s'%n",
+            cell.getRowIndex(), cell.getColumnIndex(), cell.getContent());
     }
 }
 ```
 
-### Extract Layout from URL
+### From URL
 
 ```java
-String documentUrl = "https://example.com/document.pdf";
+String documentUrl = "https://raw.githubusercontent.com/Azure/azure-sdk-for-java/main/"
+    + "sdk/documentintelligence/azure-ai-documentintelligence/"
+    + "src/samples/resources/sample-forms/forms/Form_1.jpg";
 
-SyncPoller<OperationResult, AnalyzeResult> poller = 
-    client.beginAnalyzeDocumentFromUrl("prebuilt-layout", documentUrl);
+SyncPoller<AnalyzeOperationDetails, AnalyzeResult> poller =
+    client.beginAnalyzeDocument("prebuilt-layout",
+        new AnalyzeDocumentOptions(documentUrl));
 
 AnalyzeResult result = poller.getFinalResult();
+System.out.printf("Content: %s%n", result.getContent());
 ```
 
-## Receipt Analysis
+---
+
+## 3. Analyze Receipts
 
 ```java
-String receiptUrl = "https://example.com/receipt.jpg";
+import com.azure.ai.documentintelligence.models.*;
+import java.util.Map;
 
-SyncPoller<OperationResult, AnalyzeResult> poller = 
-    client.beginAnalyzeDocumentFromUrl("prebuilt-receipt", receiptUrl);
+String receiptUrl = "https://raw.githubusercontent.com/Azure/azure-sdk-for-java/main/"
+    + "sdk/documentintelligence/azure-ai-documentintelligence/"
+    + "src/samples/resources/sample-forms/receipts/contoso-allinone.jpg";
+
+SyncPoller<AnalyzeOperationDetails, AnalyzeResult> poller =
+    client.beginAnalyzeDocument("prebuilt-receipt",
+        new AnalyzeDocumentOptions(receiptUrl));
 
 AnalyzeResult result = poller.getFinalResult();
 
-for (AnalyzedDocument doc : result.getDocuments()) {
-    Map<String, DocumentField> fields = doc.getFields();
-    
+for (AnalyzedDocument receipt : result.getDocuments()) {
+    Map<String, DocumentField> fields = receipt.getFields();
+
     // Merchant name
     DocumentField merchantName = fields.get("MerchantName");
     if (merchantName != null && merchantName.getType() == DocumentFieldType.STRING) {
         System.out.printf("Merchant: %s (confidence: %.2f)%n",
-            merchantName.getValueAsString(),
-            merchantName.getConfidence());
+            merchantName.getValueString(), merchantName.getConfidence());
     }
-    
+
+    // Merchant phone
+    DocumentField phone = fields.get("MerchantPhoneNumber");
+    if (phone != null && phone.getType() == DocumentFieldType.PHONE_NUMBER) {
+        System.out.printf("Phone: %s%n", phone.getValuePhoneNumber());
+    }
+
+    // Merchant address
+    DocumentField address = fields.get("MerchantAddress");
+    if (address != null && address.getType() == DocumentFieldType.STRING) {
+        System.out.printf("Address: %s%n", address.getValueString());
+    }
+
     // Transaction date
-    DocumentField transactionDate = fields.get("TransactionDate");
-    if (transactionDate != null && transactionDate.getType() == DocumentFieldType.DATE) {
-        System.out.printf("Date: %s%n", transactionDate.getValueAsDate());
+    DocumentField date = fields.get("TransactionDate");
+    if (date != null && date.getType() == DocumentFieldType.DATE) {
+        System.out.printf("Date: %s%n", date.getValueDate());
     }
-    
-    // Total amount
+
+    // Total
     DocumentField total = fields.get("Total");
-    if (total != null && total.getType() == DocumentFieldType.DOUBLE) {
-        System.out.printf("Total: $%.2f%n", total.getValueAsDouble());
+    if (total != null && total.getType() == DocumentFieldType.NUMBER) {
+        System.out.printf("Total: %.2f%n", total.getValueNumber());
     }
-    
-    // Line items
+
+    // Items (array field)
     DocumentField items = fields.get("Items");
     if (items != null && items.getType() == DocumentFieldType.LIST) {
-        System.out.println("Items:");
-        for (DocumentField item : items.getValueAsList()) {
-            Map<String, DocumentField> itemFields = item.getValueAsMap();
-            
-            DocumentField name = itemFields.get("Name");
-            DocumentField price = itemFields.get("Price");
-            DocumentField quantity = itemFields.get("Quantity");
-            
-            System.out.printf("  - %s x%s: $%.2f%n",
-                name != null ? name.getValueAsString() : "Unknown",
-                quantity != null ? quantity.getValueAsDouble().intValue() : 1,
-                price != null ? price.getValueAsDouble() : 0.0);
+        for (DocumentField item : items.getValueList()) {
+            Map<String, DocumentField> itemFields = item.getValueObject();
+            DocumentField description = itemFields.get("Description");
+            DocumentField totalPrice = itemFields.get("TotalPrice");
+            if (description != null) {
+                System.out.printf("  Item: %s", description.getValueString());
+            }
+            if (totalPrice != null) {
+                System.out.printf(" - $%.2f", totalPrice.getValueNumber());
+            }
+            System.out.println();
         }
     }
 }
 ```
 
-## Invoice Analysis
+---
+
+## 4. Analyze Invoices
 
 ```java
-String invoiceUrl = "https://example.com/invoice.pdf";
+String invoiceUrl = "https://raw.githubusercontent.com/Azure/azure-sdk-for-java/main/"
+    + "sdk/documentintelligence/azure-ai-documentintelligence/"
+    + "src/samples/resources/sample-forms/invoices/sample_invoice.jpg";
 
-SyncPoller<OperationResult, AnalyzeResult> poller = 
-    client.beginAnalyzeDocumentFromUrl("prebuilt-invoice", invoiceUrl);
+SyncPoller<AnalyzeOperationDetails, AnalyzeResult> poller =
+    client.beginAnalyzeDocument("prebuilt-invoice",
+        new AnalyzeDocumentOptions(invoiceUrl));
 
 AnalyzeResult result = poller.getFinalResult();
 
 for (AnalyzedDocument invoice : result.getDocuments()) {
     Map<String, DocumentField> fields = invoice.getFields();
-    
-    // Vendor information
+
     DocumentField vendorName = fields.get("VendorName");
-    DocumentField vendorAddress = fields.get("VendorAddress");
-    
-    System.out.println("=== Vendor ===");
     if (vendorName != null) {
-        System.out.println("Name: " + vendorName.getValueAsString());
+        System.out.printf("Vendor: %s%n", vendorName.getValueString());
     }
-    if (vendorAddress != null) {
-        System.out.println("Address: " + vendorAddress.getContent());
-    }
-    
-    // Customer information
+
     DocumentField customerName = fields.get("CustomerName");
-    DocumentField customerAddress = fields.get("CustomerAddress");
-    
-    System.out.println("=== Customer ===");
     if (customerName != null) {
-        System.out.println("Name: " + customerName.getValueAsString());
+        System.out.printf("Customer: %s%n", customerName.getValueString());
     }
-    
-    // Invoice details
-    DocumentField invoiceId = fields.get("InvoiceId");
-    DocumentField invoiceDate = fields.get("InvoiceDate");
-    DocumentField dueDate = fields.get("DueDate");
-    
-    System.out.println("=== Invoice Details ===");
-    if (invoiceId != null) {
-        System.out.println("Invoice ID: " + invoiceId.getValueAsString());
-    }
-    if (invoiceDate != null) {
-        System.out.println("Invoice Date: " + invoiceDate.getValueAsDate());
-    }
-    if (dueDate != null) {
-        System.out.println("Due Date: " + dueDate.getValueAsDate());
-    }
-    
-    // Amounts
-    DocumentField subTotal = fields.get("SubTotal");
-    DocumentField totalTax = fields.get("TotalTax");
+
     DocumentField invoiceTotal = fields.get("InvoiceTotal");
-    DocumentField amountDue = fields.get("AmountDue");
-    
-    System.out.println("=== Amounts ===");
-    if (subTotal != null) {
-        System.out.printf("Subtotal: $%.2f%n", subTotal.getValueAsDouble());
+    if (invoiceTotal != null && invoiceTotal.getType() == DocumentFieldType.NUMBER) {
+        System.out.printf("Total: %.2f (Currency: %s)%n",
+            invoiceTotal.getValueNumber(),
+            fields.containsKey("CurrencyCode")
+                ? fields.get("CurrencyCode").getValueString() : "N/A");
     }
-    if (totalTax != null) {
-        System.out.printf("Tax: $%.2f%n", totalTax.getValueAsDouble());
+
+    DocumentField invoiceDate = fields.get("InvoiceDate");
+    if (invoiceDate != null && invoiceDate.getType() == DocumentFieldType.DATE) {
+        System.out.printf("Date: %s%n", invoiceDate.getValueDate());
     }
-    if (invoiceTotal != null) {
-        System.out.printf("Total: $%.2f%n", invoiceTotal.getValueAsDouble());
-    }
-    
+
     // Line items
-    DocumentField items = fields.get("Items");
-    if (items != null && items.getType() == DocumentFieldType.LIST) {
-        System.out.println("=== Line Items ===");
-        for (DocumentField item : items.getValueAsList()) {
-            Map<String, DocumentField> itemFields = item.getValueAsMap();
-            
-            String description = getStringValue(itemFields.get("Description"));
-            Double quantity = getDoubleValue(itemFields.get("Quantity"));
-            Double unitPrice = getDoubleValue(itemFields.get("UnitPrice"));
-            Double amount = getDoubleValue(itemFields.get("Amount"));
-            
-            System.out.printf("  %s | Qty: %.0f | Unit: $%.2f | Amount: $%.2f%n",
-                description, quantity, unitPrice, amount);
+    DocumentField lineItems = fields.get("Items");
+    if (lineItems != null && lineItems.getType() == DocumentFieldType.LIST) {
+        for (DocumentField lineItem : lineItems.getValueList()) {
+            Map<String, DocumentField> itemFields = lineItem.getValueObject();
+            System.out.printf("  Item: %s, Qty: %s, Amount: %s%n",
+                getFieldString(itemFields, "Description"),
+                getFieldString(itemFields, "Quantity"),
+                getFieldString(itemFields, "Amount"));
         }
     }
 }
 
-// Helper methods
-private static String getStringValue(DocumentField field) {
-    return field != null ? field.getValueAsString() : "";
-}
-
-private static Double getDoubleValue(DocumentField field) {
-    return field != null ? field.getValueAsDouble() : 0.0;
+// Helper
+static String getFieldString(Map<String, DocumentField> fields, String key) {
+    DocumentField field = fields.get(key);
+    return (field != null) ? field.getContent() : "N/A";
 }
 ```
 
-## ID Document Analysis
+---
+
+## 5. Analyze ID Documents
 
 ```java
-String idDocumentUrl = "https://example.com/drivers-license.jpg";
+String idDocUrl = "https://raw.githubusercontent.com/Azure/azure-sdk-for-java/main/"
+    + "sdk/documentintelligence/azure-ai-documentintelligence/"
+    + "src/samples/resources/sample-forms/identityDocuments/license.jpg";
 
-SyncPoller<OperationResult, AnalyzeResult> poller = 
-    client.beginAnalyzeDocumentFromUrl("prebuilt-idDocument", idDocumentUrl);
+SyncPoller<AnalyzeOperationDetails, AnalyzeResult> poller =
+    client.beginAnalyzeDocument("prebuilt-idDocument",
+        new AnalyzeDocumentOptions(idDocUrl));
 
 AnalyzeResult result = poller.getFinalResult();
 
 for (AnalyzedDocument idDoc : result.getDocuments()) {
     Map<String, DocumentField> fields = idDoc.getFields();
-    
-    // Document type
-    System.out.println("Document Type: " + idDoc.getDocType());
-    
-    // Personal information
+
     DocumentField firstName = fields.get("FirstName");
     DocumentField lastName = fields.get("LastName");
-    DocumentField dateOfBirth = fields.get("DateOfBirth");
-    DocumentField sex = fields.get("Sex");
-    
-    System.out.println("=== Personal Information ===");
-    if (firstName != null) System.out.println("First Name: " + firstName.getValueAsString());
-    if (lastName != null) System.out.println("Last Name: " + lastName.getValueAsString());
-    if (dateOfBirth != null) System.out.println("DOB: " + dateOfBirth.getValueAsDate());
-    if (sex != null) System.out.println("Sex: " + sex.getValueAsString());
-    
-    // Document information
-    DocumentField documentNumber = fields.get("DocumentNumber");
-    DocumentField expirationDate = fields.get("DateOfExpiration");
-    DocumentField address = fields.get("Address");
-    DocumentField region = fields.get("Region");
-    DocumentField country = fields.get("CountryRegion");
-    
-    System.out.println("=== Document Information ===");
-    if (documentNumber != null) System.out.println("Document #: " + documentNumber.getValueAsString());
-    if (expirationDate != null) System.out.println("Expires: " + expirationDate.getValueAsDate());
-    if (address != null) System.out.println("Address: " + address.getContent());
-    if (region != null) System.out.println("Region: " + region.getValueAsString());
-    if (country != null) System.out.println("Country: " + country.getValueAsString());
+    DocumentField docNumber = fields.get("DocumentNumber");
+    DocumentField dob = fields.get("DateOfBirth");
+
+    if (firstName != null) System.out.printf("First Name: %s%n", firstName.getValueString());
+    if (lastName != null) System.out.printf("Last Name: %s%n", lastName.getValueString());
+    if (docNumber != null) System.out.printf("Document Number: %s%n", docNumber.getValueString());
+    if (dob != null && dob.getType() == DocumentFieldType.DATE) {
+        System.out.printf("Date of Birth: %s%n", dob.getValueDate());
+    }
 }
 ```
 
-## Custom Models
+---
 
-### Build Custom Model
+## 6. Build Custom Model
 
 ```java
-import com.azure.ai.formrecognizer.documentanalysis.administration.models.*;
-import com.azure.core.util.Context;
+import com.azure.ai.documentintelligence.models.*;
+import com.azure.core.util.polling.SyncPoller;
 
-String blobContainerUrl = "https://storage.blob.core.windows.net/training-data?sasToken";
-String prefix = "invoices/";
+String blobContainerUrl = "{SAS_URL_of_your_container_in_blob_storage}";
 
-SyncPoller<OperationResult, DocumentModelDetails> poller = adminClient.beginBuildDocumentModel(
-    blobContainerUrl,
-    DocumentModelBuildMode.TEMPLATE,
-    prefix,
-    new BuildDocumentModelOptions()
-        .setModelId("my-custom-invoice-model")
-        .setDescription("Custom model for company invoices"),
-    Context.NONE);
+SyncPoller<DocumentModelBuildOperationDetails, DocumentModelDetails> poller =
+    adminClient.beginBuildDocumentModel(
+        new BuildDocumentModelOptions("my-custom-model", DocumentBuildMode.TEMPLATE)
+            .setAzureBlobSource(new AzureBlobContentSource(blobContainerUrl)));
 
 DocumentModelDetails model = poller.getFinalResult();
 
-System.out.println("Model ID: " + model.getModelId());
-System.out.println("Description: " + model.getDescription());
-System.out.println("Created: " + model.getCreatedOn());
+System.out.printf("Model ID: %s%n", model.getModelId());
+System.out.printf("Description: %s%n", model.getDescription());
+System.out.printf("Created: %s%n", model.getCreatedOn());
 
-// Show document types and fields
-model.getDocumentTypes().forEach((docType, details) -> {
-    System.out.println("\nDocument type: " + docType);
-    details.getFieldSchema().forEach((field, schema) -> {
-        System.out.printf("  Field: %s (%s)%n", field, schema.getType());
+if (model.getDocumentTypes() != null) {
+    model.getDocumentTypes().forEach((docType, details) -> {
+        System.out.printf("Document type: %s%n", docType);
+        details.getFieldSchema().forEach((field, schema) -> {
+            System.out.printf("  Field: %s (%s)%n", field, schema.getType());
+            if (details.getFieldConfidence() != null) {
+                System.out.printf("  Confidence: %.2f%n",
+                    details.getFieldConfidence().get(field));
+            }
+        });
     });
-});
+}
 ```
 
-### Analyze with Custom Model
+---
+
+## 7. Analyze with Custom Model
 
 ```java
-String documentUrl = "https://example.com/new-invoice.pdf";
+import java.util.Arrays;
+import java.util.Collections;
 
-SyncPoller<OperationResult, AnalyzeResult> poller = 
-    client.beginAnalyzeDocumentFromUrl("my-custom-invoice-model", documentUrl);
+String documentUrl = "{document-url}";
+String modelId = "my-custom-model";
+
+SyncPoller<AnalyzeOperationDetails, AnalyzeResult> poller =
+    client.beginAnalyzeDocument(modelId,
+        new AnalyzeDocumentOptions(documentUrl)
+            .setPages(Collections.singletonList("1"))
+            .setLocale("en-US")
+            .setStringIndexType(StringIndexType.TEXT_ELEMENTS)
+            .setDocumentAnalysisFeatures(
+                Arrays.asList(DocumentAnalysisFeature.LANGUAGES))
+            .setOutputContentFormat(DocumentContentFormat.TEXT));
 
 AnalyzeResult result = poller.getFinalResult();
 
 for (AnalyzedDocument doc : result.getDocuments()) {
-    System.out.printf("Document type: %s (confidence: %.2f)%n",
-        doc.getDocType(),
-        doc.getConfidence());
-    
+    System.out.printf("Doc type: %s (confidence: %.2f)%n",
+        doc.getDocumentType(), doc.getConfidence());
     doc.getFields().forEach((name, field) -> {
-        System.out.printf("Field '%s': %s (confidence: %.2f)%n",
-            name,
-            field.getContent(),
-            field.getConfidence());
+        System.out.printf("  %s: %s (confidence: %.2f)%n",
+            name, field.getContent(), field.getConfidence());
     });
+}
+
+// Pages, lines, words
+for (DocumentPage page : result.getPages()) {
+    System.out.printf("Page %d: %.2f x %.2f %s%n",
+        page.getPageNumber(), page.getWidth(), page.getHeight(), page.getUnit());
+    for (DocumentLine line : page.getLines()) {
+        System.out.printf("  Line: '%s'%n", line.getContent());
+    }
+    for (DocumentWord word : page.getWords()) {
+        System.out.printf("  Word: '%s' (%.2f)%n",
+            word.getContent(), word.getConfidence());
+    }
+}
+
+// Tables
+for (DocumentTable table : result.getTables()) {
+    System.out.printf("Table: %d rows x %d columns%n",
+        table.getRowCount(), table.getColumnCount());
+    for (DocumentTableCell cell : table.getCells()) {
+        System.out.printf("  Cell[%d,%d]: '%s'%n",
+            cell.getRowIndex(), cell.getColumnIndex(), cell.getContent());
+    }
 }
 ```
 
-### Compose Multiple Models
+---
 
-```java
-import java.util.Arrays;
-import java.util.List;
-
-List<String> modelIds = Arrays.asList(
-    "invoice-model-2023",
-    "invoice-model-2024",
-    "receipt-model"
-);
-
-SyncPoller<OperationResult, DocumentModelDetails> poller = 
-    adminClient.beginComposeDocumentModel(
-        modelIds,
-        new ComposeDocumentModelOptions()
-            .setModelId("composed-financial-model")
-            .setDescription("Composed model for invoices and receipts"));
-
-DocumentModelDetails composedModel = poller.getFinalResult();
-System.out.println("Composed model ID: " + composedModel.getModelId());
-```
-
-## Document Classification
+## 8. Document Classification
 
 ### Build Classifier
 
@@ -453,343 +376,220 @@ System.out.println("Composed model ID: " + composedModel.getModelId());
 import java.util.HashMap;
 import java.util.Map;
 
-String containerUrl = "https://storage.blob.core.windows.net/training-data?sasToken";
-
 Map<String, ClassifierDocumentTypeDetails> docTypes = new HashMap<>();
 
 docTypes.put("invoice", new ClassifierDocumentTypeDetails()
-    .setAzureBlobSource(new AzureBlobContentSource(containerUrl)
+    .setAzureBlobSource(new AzureBlobContentSource(containerSasUrl)
         .setPrefix("invoices/")));
 
 docTypes.put("receipt", new ClassifierDocumentTypeDetails()
-    .setAzureBlobSource(new AzureBlobContentSource(containerUrl)
+    .setAzureBlobSource(new AzureBlobContentSource(containerSasUrl)
         .setPrefix("receipts/")));
 
-docTypes.put("purchase-order", new ClassifierDocumentTypeDetails()
-    .setAzureBlobSource(new AzureBlobContentSource(containerUrl)
-        .setPrefix("purchase-orders/")));
-
-SyncPoller<OperationResult, DocumentClassifierDetails> poller = 
-    adminClient.beginBuildDocumentClassifier(
-        docTypes,
-        new BuildDocumentClassifierOptions()
-            .setClassifierId("financial-doc-classifier")
-            .setDescription("Classifier for financial documents"));
+SyncPoller<DocumentClassifierBuildOperationDetails, DocumentClassifierDetails> poller =
+    adminClient.beginBuildClassifier(
+        new BuildDocumentClassifierOptions("my-classifier", docTypes));
 
 DocumentClassifierDetails classifier = poller.getFinalResult();
-System.out.println("Classifier ID: " + classifier.getClassifierId());
-System.out.println("Document types: " + classifier.getDocumentTypes().keySet());
+System.out.printf("Classifier ID: %s%n", classifier.getClassifierId());
+System.out.printf("Created: %s%n", classifier.getCreatedOn());
+
+classifier.getDocumentTypes().forEach((type, details) ->
+    System.out.printf("  Type: %s%n", type));
 ```
 
-### Classify Document
+### Classify a Document
 
 ```java
-String documentUrl = "https://example.com/unknown-document.pdf";
+String documentUrl = "https://example.com/document.pdf";
 
-SyncPoller<OperationResult, AnalyzeResult> poller = 
-    client.beginClassifyDocumentFromUrl("financial-doc-classifier", documentUrl, Context.NONE);
+SyncPoller<AnalyzeOperationDetails, AnalyzeResult> poller =
+    client.beginClassifyDocument("my-classifier",
+        new ClassifyDocumentOptions(documentUrl));
 
 AnalyzeResult result = poller.getFinalResult();
 
 for (AnalyzedDocument doc : result.getDocuments()) {
-    System.out.printf("Classified as: %s (confidence: %.2f)%n",
-        doc.getDocType(),
-        doc.getConfidence());
-    
-    // Get bounding regions for the classified content
-    if (doc.getBoundingRegions() != null) {
-        for (BoundingRegion region : doc.getBoundingRegions()) {
-            System.out.printf("  Page %d%n", region.getPageNumber());
-        }
-    }
+    System.out.printf("Type: %s (confidence: %.2f), pages: %d-%d%n",
+        doc.getDocumentType(),
+        doc.getConfidence(),
+        doc.getBoundingRegions().get(0).getPageNumber(),
+        doc.getBoundingRegions().get(doc.getBoundingRegions().size() - 1).getPageNumber());
 }
 ```
 
-## Model Management
+---
 
-### List Models
+## 9. Manage Models
 
 ```java
-import com.azure.core.http.rest.PagedIterable;
+// Resource limits
+DocumentIntelligenceResourceDetails resourceDetails = adminClient.getResourceDetails();
+System.out.printf("Models: %d / %d%n",
+    resourceDetails.getCustomDocumentModels().getCount(),
+    resourceDetails.getCustomDocumentModels().getLimit());
 
-PagedIterable<DocumentModelSummary> models = adminClient.listDocumentModels();
-
-System.out.println("Available models:");
-for (DocumentModelSummary summary : models) {
-    System.out.printf("  %s - Created: %s%n",
-        summary.getModelId(),
-        summary.getCreatedOn());
+// List all models
+PagedIterable<DocumentModelDetails> models = adminClient.listModels();
+for (DocumentModelDetails model : models) {
+    System.out.printf("Model: %s (created: %s)%n",
+        model.getModelId(), model.getCreatedOn());
 }
-```
 
-### Get Model Details
+// Get specific model
+DocumentModelDetails model = adminClient.getModel("model-id");
+System.out.printf("Model ID: %s%n", model.getModelId());
+System.out.printf("Description: %s%n", model.getDescription());
+System.out.printf("Created: %s%n", model.getCreatedOn());
 
-```java
-DocumentModelDetails model = adminClient.getDocumentModel("my-custom-model");
-
-System.out.println("Model ID: " + model.getModelId());
-System.out.println("Description: " + model.getDescription());
-System.out.println("Created: " + model.getCreatedOn());
-System.out.println("Expiration: " + model.getExpiresOn());
-```
-
-### Delete Model
-
-```java
-adminClient.deleteDocumentModel("old-model-id");
-System.out.println("Model deleted successfully");
-```
-
-### Check Resource Limits
-
-```java
-ResourceDetails resources = adminClient.getResourceDetails();
-
-System.out.println("=== Resource Limits ===");
-System.out.printf("Custom models: %d / %d%n",
-    resources.getCustomDocumentModelCount(),
-    resources.getCustomDocumentModelLimit());
-```
-
-### List Classifiers
-
-```java
-PagedIterable<DocumentClassifierDetails> classifiers = adminClient.listDocumentClassifiers();
-
-for (DocumentClassifierDetails classifier : classifiers) {
-    System.out.printf("Classifier: %s, Types: %s%n",
-        classifier.getClassifierId(),
-        classifier.getDocumentTypes().keySet());
+if (model.getDocumentTypes() != null) {
+    model.getDocumentTypes().forEach((docType, details) -> {
+        details.getFieldSchema().forEach((field, schema) -> {
+            System.out.printf("  Field: %s (%s)%n", field, schema.getType());
+        });
+    });
 }
+
+// Delete model
+adminClient.deleteModel("model-id");
 ```
 
-## Async Patterns
+---
 
-### Async Document Analysis
+## 10. Async Pattern
 
 ```java
+import com.azure.ai.documentintelligence.DocumentIntelligenceAsyncClient;
 import reactor.core.publisher.Mono;
 
-DocumentAnalysisAsyncClient asyncClient = new DocumentAnalysisClientBuilder()
-    .endpoint(endpoint)
+DocumentIntelligenceAsyncClient asyncClient = new DocumentIntelligenceClientBuilder()
+    .endpoint(System.getenv("DOCUMENT_INTELLIGENCE_ENDPOINT"))
     .credential(new DefaultAzureCredentialBuilder().build())
     .buildAsyncClient();
 
-String documentUrl = "https://example.com/document.pdf";
-
-asyncClient.beginAnalyzeDocumentFromUrl("prebuilt-invoice", documentUrl)
+// Async analyze from URL
+asyncClient.beginAnalyzeDocument("prebuilt-layout",
+        new AnalyzeDocumentOptions(documentUrl))
     .flatMap(poller -> poller.getFinalResult())
-    .subscribe(
-        result -> {
-            System.out.println("Analysis complete!");
-            for (AnalyzedDocument doc : result.getDocuments()) {
-                System.out.println("Document type: " + doc.getDocType());
-            }
-        },
-        error -> System.err.println("Error: " + error.getMessage()),
-        () -> System.out.println("Done")
-    );
-
-// Block for demo purposes
-Thread.sleep(30000);
+    .subscribe(result -> {
+        System.out.printf("Content: %s%n", result.getContent());
+        result.getPages().forEach(page ->
+            System.out.printf("Page %d: %d lines%n",
+                page.getPageNumber(), page.getLines().size()));
+    }, error -> System.err.printf("Error: %s%n", error.getMessage()));
 ```
 
-### Parallel Analysis
+---
 
-```java
-import reactor.core.publisher.Flux;
-import java.util.Arrays;
-import java.util.List;
-
-List<String> documentUrls = Arrays.asList(
-    "https://example.com/invoice1.pdf",
-    "https://example.com/invoice2.pdf",
-    "https://example.com/invoice3.pdf"
-);
-
-Flux.fromIterable(documentUrls)
-    .flatMap(url -> asyncClient.beginAnalyzeDocumentFromUrl("prebuilt-invoice", url)
-        .flatMap(poller -> poller.getFinalResult())
-        .map(result -> new DocumentResult(url, result)))
-    .subscribe(
-        docResult -> System.out.printf("Processed: %s - %d documents%n",
-            docResult.url, docResult.result.getDocuments().size()),
-        error -> System.err.println("Error: " + error.getMessage())
-    );
-
-// Helper class
-class DocumentResult {
-    String url;
-    AnalyzeResult result;
-    
-    DocumentResult(String url, AnalyzeResult result) {
-        this.url = url;
-        this.result = result;
-    }
-}
-```
-
-## Error Handling
+## 11. Error Handling
 
 ```java
 import com.azure.core.exception.HttpResponseException;
 
 try {
-    SyncPoller<OperationResult, AnalyzeResult> poller = 
-        client.beginAnalyzeDocumentFromUrl("prebuilt-receipt", "invalid-url");
-    poller.getFinalResult();
+    SyncPoller<AnalyzeOperationDetails, AnalyzeResult> poller =
+        client.beginAnalyzeDocument("prebuilt-receipt",
+            new AnalyzeDocumentOptions("not-a-valid-url"));
+
+    AnalyzeResult result = poller.getFinalResult();
 } catch (HttpResponseException e) {
-    System.err.println("HTTP Status: " + e.getResponse().getStatusCode());
-    System.err.println("Error Message: " + e.getMessage());
-    
-    // Handle specific errors
-    int statusCode = e.getResponse().getStatusCode();
-    if (statusCode == 400) {
-        System.err.println("Bad request - check document URL or format");
-    } else if (statusCode == 401) {
-        System.err.println("Unauthorized - check credentials");
-    } else if (statusCode == 404) {
-        System.err.println("Model not found");
-    } else if (statusCode == 429) {
-        System.err.println("Rate limited - retry with backoff");
-    }
+    System.err.printf("HTTP Error %d: %s%n",
+        e.getResponse().getStatusCode(), e.getMessage());
 } catch (Exception e) {
-    System.err.println("Unexpected error: " + e.getMessage());
+    System.err.printf("Error: %s%n", e.getMessage());
 }
 ```
 
-## Complete Application Example
+---
+
+## 12. Complete Application Example
 
 ```java
-import com.azure.ai.formrecognizer.documentanalysis.DocumentAnalysisClient;
-import com.azure.ai.formrecognizer.documentanalysis.DocumentAnalysisClientBuilder;
-import com.azure.ai.formrecognizer.documentanalysis.models.*;
+import com.azure.ai.documentintelligence.DocumentIntelligenceClient;
+import com.azure.ai.documentintelligence.DocumentIntelligenceClientBuilder;
+import com.azure.ai.documentintelligence.models.*;
+import com.azure.core.exception.HttpResponseException;
 import com.azure.core.util.polling.SyncPoller;
 import com.azure.identity.DefaultAzureCredentialBuilder;
 
 import java.util.Map;
 
-public class InvoiceProcessor {
-    
-    private final DocumentAnalysisClient client;
-    
-    public InvoiceProcessor() {
-        this.client = new DocumentAnalysisClientBuilder()
-            .endpoint(System.getenv("FORM_RECOGNIZER_ENDPOINT"))
+public class DocumentIntelligenceExample {
+
+    public static void main(String[] args) {
+        // Initialize client
+        DocumentIntelligenceClient client = new DocumentIntelligenceClientBuilder()
+            .endpoint(System.getenv("DOCUMENT_INTELLIGENCE_ENDPOINT"))
             .credential(new DefaultAzureCredentialBuilder().build())
             .buildClient();
-    }
-    
-    public InvoiceData processInvoice(String invoiceUrl) {
-        SyncPoller<OperationResult, AnalyzeResult> poller = 
-            client.beginAnalyzeDocumentFromUrl("prebuilt-invoice", invoiceUrl);
-        
-        AnalyzeResult result = poller.getFinalResult();
-        
-        if (result.getDocuments().isEmpty()) {
-            throw new RuntimeException("No invoice found in document");
-        }
-        
-        AnalyzedDocument invoice = result.getDocuments().get(0);
-        Map<String, DocumentField> fields = invoice.getFields();
-        
-        return new InvoiceData(
-            getStringField(fields, "InvoiceId"),
-            getStringField(fields, "VendorName"),
-            getStringField(fields, "CustomerName"),
-            getDateField(fields, "InvoiceDate"),
-            getDateField(fields, "DueDate"),
-            getDoubleField(fields, "SubTotal"),
-            getDoubleField(fields, "TotalTax"),
-            getDoubleField(fields, "InvoiceTotal"),
-            invoice.getConfidence()
-        );
-    }
-    
-    private String getStringField(Map<String, DocumentField> fields, String name) {
-        DocumentField field = fields.get(name);
-        return field != null ? field.getValueAsString() : null;
-    }
-    
-    private java.time.LocalDate getDateField(Map<String, DocumentField> fields, String name) {
-        DocumentField field = fields.get(name);
-        return field != null ? field.getValueAsDate() : null;
-    }
-    
-    private Double getDoubleField(Map<String, DocumentField> fields, String name) {
-        DocumentField field = fields.get(name);
-        return field != null ? field.getValueAsDouble() : null;
-    }
-    
-    // Data class for invoice
-    public static class InvoiceData {
-        public final String invoiceId;
-        public final String vendorName;
-        public final String customerName;
-        public final java.time.LocalDate invoiceDate;
-        public final java.time.LocalDate dueDate;
-        public final Double subTotal;
-        public final Double tax;
-        public final Double total;
-        public final double confidence;
-        
-        public InvoiceData(String invoiceId, String vendorName, String customerName,
-                          java.time.LocalDate invoiceDate, java.time.LocalDate dueDate,
-                          Double subTotal, Double tax, Double total, double confidence) {
-            this.invoiceId = invoiceId;
-            this.vendorName = vendorName;
-            this.customerName = customerName;
-            this.invoiceDate = invoiceDate;
-            this.dueDate = dueDate;
-            this.subTotal = subTotal;
-            this.tax = tax;
-            this.total = total;
-            this.confidence = confidence;
-        }
-        
-        @Override
-        public String toString() {
-            return String.format(
-                "Invoice %s from %s to %s: $%.2f (confidence: %.2f)",
-                invoiceId, vendorName, customerName, total, confidence
-            );
-        }
-    }
-    
-    public static void main(String[] args) {
-        InvoiceProcessor processor = new InvoiceProcessor();
-        
-        String invoiceUrl = "https://raw.githubusercontent.com/Azure-Samples/cognitive-services-REST-api-samples/master/curl/form-recognizer/sample-invoice.pdf";
-        
+
+        String receiptUrl = "https://raw.githubusercontent.com/Azure/azure-sdk-for-java/main/"
+            + "sdk/documentintelligence/azure-ai-documentintelligence/"
+            + "src/samples/resources/sample-forms/receipts/contoso-allinone.jpg";
+
         try {
-            InvoiceData invoice = processor.processInvoice(invoiceUrl);
-            System.out.println(invoice);
-        } catch (Exception e) {
-            System.err.println("Failed to process invoice: " + e.getMessage());
+            // Analyze receipt
+            SyncPoller<AnalyzeOperationDetails, AnalyzeResult> poller =
+                client.beginAnalyzeDocument("prebuilt-receipt",
+                    new AnalyzeDocumentOptions(receiptUrl));
+
+            AnalyzeResult result = poller.getFinalResult();
+
+            System.out.printf("Analyzed %d document(s):%n", result.getDocuments().size());
+
+            for (AnalyzedDocument doc : result.getDocuments()) {
+                Map<String, DocumentField> fields = doc.getFields();
+
+                printField("Merchant", fields.get("MerchantName"));
+                printField("Date", fields.get("TransactionDate"));
+                printField("Total", fields.get("Total"));
+
+                DocumentField items = fields.get("Items");
+                if (items != null && items.getType() == DocumentFieldType.LIST) {
+                    System.out.println("Items:");
+                    for (DocumentField item : items.getValueList()) {
+                        Map<String, DocumentField> itemFields = item.getValueObject();
+                        DocumentField desc = itemFields.get("Description");
+                        DocumentField price = itemFields.get("TotalPrice");
+                        System.out.printf("  - %s: %s%n",
+                            desc != null ? desc.getContent() : "?",
+                            price != null ? price.getContent() : "?");
+                    }
+                }
+            }
+        } catch (HttpResponseException e) {
+            System.err.printf("Service error %d: %s%n",
+                e.getResponse().getStatusCode(), e.getMessage());
+        }
+    }
+
+    static void printField(String label, DocumentField field) {
+        if (field != null) {
+            System.out.printf("%s: %s (confidence: %.2f)%n",
+                label, field.getContent(), field.getConfidence());
         }
     }
 }
 ```
 
-## Environment Variables
+---
 
-```bash
-FORM_RECOGNIZER_ENDPOINT=https://<resource>.cognitiveservices.azure.com/
-FORM_RECOGNIZER_KEY=<your-api-key>
+## Field Type Accessors Reference
 
-# For DefaultAzureCredential
-AZURE_CLIENT_ID=<service-principal-client-id>
-AZURE_CLIENT_SECRET=<service-principal-secret>
-AZURE_TENANT_ID=<tenant-id>
-```
-
-## Best Practices
-
-1. **Use DefaultAzureCredential** — Prefer managed identity over API keys in production
-2. **Choose the right model** — Use prebuilt models when possible; custom models for specialized documents
-3. **Handle polling properly** — Use `getFinalResult()` for synchronous waits
-4. **Check confidence scores** — Validate extracted data based on confidence thresholds
-5. **Process in batches** — Use async client for parallel processing of multiple documents
-6. **Implement retry logic** — Handle rate limiting (429) with exponential backoff
-7. **Clean up resources** — Delete unused custom models to stay within limits
-8. **Use classification first** — For mixed document types, classify before extraction
+| DocumentFieldType | Accessor Method |
+|---|---|
+| `STRING` | `getValueString()` |
+| `DATE` | `getValueDate()` |
+| `TIME` | `getValueTime()` |
+| `PHONE_NUMBER` | `getValuePhoneNumber()` |
+| `NUMBER` | `getValueNumber()` |
+| `INTEGER` | `getValueInteger()` |
+| `BOOLEAN` | `getValueBoolean()` |
+| `LIST` | `getValueList()` → `List<DocumentField>` |
+| `OBJECT` | `getValueObject()` → `Map<String, DocumentField>` |
+| `CURRENCY` | `getValueCurrency()` → `CurrencyValue` |
+| `ADDRESS` | `getValueAddress()` → `AddressValue` |
+| `COUNTRY_REGION` | `getValueCountryRegion()` |
+| `SELECTION_MARK` | `getValueSelectionMark()` |
+| `SIGNATURE` | `getValueSignature()` |
+| (any) | `getContent()` → raw string content |
