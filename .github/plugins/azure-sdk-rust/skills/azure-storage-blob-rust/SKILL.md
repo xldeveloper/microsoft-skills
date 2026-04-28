@@ -134,6 +134,55 @@ while let Some(blob) = pager.try_next().await? {
 }
 ```
 
+## Error Handling
+
+Use `StorageError` for programmatic access to storage-specific error codes:
+
+```rust
+use azure_core::{error::ErrorKind, http::StatusCode};
+use azure_storage_blob::{StorageError, StorageErrorCode};
+
+let result = blob_client.download(None).await;
+
+match result {
+    Ok(response) => {
+        let content = response.into_body().collect_bytes().await?;
+        println!("Downloaded {} bytes", content.len());
+    }
+    Err(error) => {
+        if matches!(error.kind(), ErrorKind::HttpResponse { .. }) {
+            // Convert to StorageError for programmatic access
+            let storage_error: StorageError = error.try_into()?;
+            println!("HTTP Status: {}", storage_error.status_code);
+
+            if let Some(error_code) = &storage_error.error_code {
+                match error_code {
+                    StorageErrorCode::BlobNotFound => {
+                        println!("The blob does not exist.");
+                    }
+                    StorageErrorCode::ContainerNotFound => {
+                        println!("The container does not exist.");
+                    }
+                    StorageErrorCode::AuthorizationFailure => {
+                        println!("Authorization failed. Check your permissions.");
+                    }
+                    _ => {
+                        println!("Other error: {error_code}");
+                    }
+                }
+            }
+
+            // Request ID is useful for Azure support troubleshooting
+            if let Some(request_id) = &storage_error.request_id {
+                println!("Request ID: {request_id}");
+            }
+        } else {
+            println!("Non-HTTP error: {:?}", error);
+        }
+    }
+}
+```
+
 ## RBAC Permissions
 
 For Entra ID auth, assign one of these roles:

@@ -538,6 +538,8 @@ while let Some(operation) = poller.try_next().await? {
 }
 ```
 
+Note that clients should rarely ever retrieve status updates, in general they should almost always just await the service call.
+
 ### Error Handling
 
 ```rust
@@ -556,6 +558,62 @@ match client.get_secret("secret-name", None).await {
         }
         _ => println!("Error: {e:?}"),
     },
+}
+```
+
+Storage client error handling:
+
+```rust
+let result = blob_client.download(None).await;
+
+match result {
+    Ok(_) => {
+        println!("Blob downloaded successfully (unexpected)");
+    }
+    Err(error) => {
+        // Check if this is an HTTP response error
+        if matches!(error.kind(), ErrorKind::HttpResponse { .. }) {
+            // Convert the azure_core::Error to a StorageError for programmatic access
+            let storage_error: StorageError = error.try_into()?;
+
+            // StorageError implements Display
+            println!("\n=== StorageError (Display) ===");
+            println!("{storage_error}");
+
+            // For programmatic error handling, access fields directly:
+            println!("\n=== Programmatic Access ===");
+            println!("HTTP Status Code: {}", storage_error.status_code);
+
+            if let Some(error_code) = &storage_error.error_code {
+                // Handle specific error codes
+                match error_code {
+                    StorageErrorCode::BlobNotFound => {
+                        println!("The blob does not exist.");
+                    }
+                    StorageErrorCode::ContainerNotFound => {
+                        println!("The container does not exist.");
+                    }
+                    StorageErrorCode::AuthorizationFailure => {
+                        println!("Authorization failed. Check your permissions.");
+                    }
+                    StorageErrorCode::AuthenticationFailed => {
+                        println!("Authentication failed. Verify your credentials.");
+                    }
+                    _ => {
+                        println!("Other error: {error_code}");
+                    }
+                }
+            }
+
+            // Request ID is useful for Azure support troubleshooting
+            if let Some(request_id) = &storage_error.request_id {
+                println!("Request ID: {request_id}");
+            }
+        } else {
+            // Handle non-HTTP errors (e.g., network errors, timeouts)
+            println!("Non-HTTP error occurred: {:?}", error);
+        }
+    }
 }
 ```
 
