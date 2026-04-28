@@ -1,49 +1,25 @@
 # Changelog
 
-All notable changes to the Azure plugin will be documented in this file.
+## 1.1.15
 
-This project adheres to [Semantic Versioning](https://semver.org/).
+- feat: generate CHANGELOG.md at build time from git history ([#2068](https://github.com/microsoft/GitHub-Copilot-for-Azure/pull/2068))
 
-## [1.0.1] - 2026-03-13
+## 1.1.12
 
-### Added
+- fix: Add Foundry Toolbox integration to hosted agent create skill ([#2035](https://github.com/microsoft/GitHub-Copilot-for-Azure/pull/2035))
 
-- `azure-upgrade` — Assess and upgrade Azure workloads between plans, tiers, or SKUs.
+## 1.1.10
 
-### Changed
+- fix: strengthen azure-storage routing for storage tiers informational prompts ([#2008](https://github.com/microsoft/GitHub-Copilot-for-Azure/pull/2008))
 
-- Removed `foundry-mcp` HTTP server from `.mcp.json` (non-spec `type`/`url` fields).
-- Updated `azure-diagnostics` description.
-- Updated `microsoft-foundry` description and bumped to version 1.0.5.
+## 1.1.8
 
-## [1.0.0] - 2025-03-12
+- fix(azure-prepare): mandate Active Directory Default in SQL connection strings ([#1937](https://github.com/microsoft/GitHub-Copilot-for-Azure/pull/1937))
 
-### Added
+## 1.1.7
 
-- Initial release of the Azure plugin.
-- Vendor-neutral `.plugin/plugin.json` manifest following the [Open Plugins Specification](https://open-plugins.com/plugin-builders/specification).
-- Claude Code manifest (`.claude-plugin/plugin.json`).
-- MCP server configuration (`.mcp.json`) for Azure MCP, Foundry MCP, and Context7.
-- MIT `LICENSE` file at the plugin root.
-- 21 agent skills:
-  - `appinsights-instrumentation` — Azure Application Insights telemetry setup.
-  - `azure-ai` — Azure AI Search, Speech, OpenAI, and Document Intelligence.
-  - `azure-aigateway` — Azure API Management as an AI Gateway.
-  - `azure-cloud-migrate` — Cross-cloud migration assessment and code conversion.
-  - `azure-compliance` — Security auditing and best practices assessment.
-  - `azure-compute` — VM size recommendation and configuration.
-  - `azure-cost-optimization` — Cost savings analysis and recommendations.
-  - `azure-deploy` — Azure deployment execution (azd, Bicep, Terraform).
-  - `azure-diagnostics` — Production issue debugging and log analysis.
-  - `azure-hosted-copilot-sdk` — Build and deploy GitHub Copilot SDK apps to Azure.
-  - `azure-kusto` — Azure Data Explorer KQL queries.
-  - `azure-messaging` — Event Hubs and Service Bus SDK troubleshooting.
-  - `azure-prepare` — Application preparation for Azure deployment.
-  - `azure-quotas` — Quota and usage management.
-  - `azure-rbac` — RBAC role recommendation and assignment.
-  - `azure-resource-lookup` — Azure resource discovery and listing.
-  - `azure-resource-visualizer` — Mermaid architecture diagram generation.
-  - `azure-storage` — Blob, File, Queue, Table, and Data Lake storage.
-  - `azure-validate` — Pre-deployment validation checks.
-  - `entra-app-registration` — Microsoft Entra ID app registration and OAuth setup.
-  - `microsoft-foundry` — Foundry agent deployment, evaluation, and management.
+- fix(azure-prepare): fix Aspire AddParameter+WithBuildArg guidance for all azd versions ([#1939](https://github.com/microsoft/GitHub-Copilot-for-Azure/pull/1939))
+
+## 1.1.3
+
+- fix: clarify output directory naming to use workspace root basename ([#1990](https://github.com/microsoft/GitHub-Copilot-for-Azure/pull/1990))
