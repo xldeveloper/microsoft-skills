@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.1.19
+
+- fix: strengthen azure-resource-lookup routing for web app/website prompts ([#2006](https://github.com/microsoft/GitHub-Copilot-for-Azure/pull/2006))
+
 ## 1.1.15
 
 - feat: generate CHANGELOG.md at build time from git history ([#2068](https://github.com/microsoft/GitHub-Copilot-for-Azure/pull/2068))
