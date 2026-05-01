@@ -29,7 +29,6 @@ SDK packages and quick start examples for Azure Storage services.
 All examples use `DefaultAzureCredential` for authentication, which is recommended for **local development only**. In production, use `ManagedIdentityCredential` — see [auth-best-practices.md](auth-best-practices.md). Rust uses `DeveloperToolsCredential` as it doesn't have a `DefaultAzureCredential` equivalent.
 
 **Python** - Upload Blob:
-
 ```python
 from azure.identity import DefaultAzureCredential
 from azure.storage.blob import BlobServiceClient
@@ -41,7 +40,6 @@ blob.upload_blob(b"Hello, Azure Storage!", overwrite=True)
 ```
 
 **JavaScript** - Upload Blob:
-
 ```javascript
 import { DefaultAzureCredential } from "@azure/identity";
 import { BlobServiceClient } from "@azure/storage-blob";
@@ -53,7 +51,6 @@ await blob.uploadData(Buffer.from("Hello, Azure Storage!"));
 ```
 
 **C#** - Upload Blob:
-
 ```csharp
 using Azure.Identity;
 using Azure.Storage.Blobs;
@@ -65,7 +62,6 @@ await blob.UploadAsync(BinaryData.FromString("Hello, Azure Storage!"), overwrite
 ```
 
 **Java** - Upload Blob:
-
 ```java
 import com.azure.identity.*;
 import com.azure.storage.blob.*;
@@ -81,7 +77,6 @@ blob.upload(BinaryData.fromString("Hello, Azure Storage!"), true);
 ```
 
 **Go** - Upload Blob:
-
 ```go
 package main
 
@@ -102,7 +97,6 @@ func main() {
 ```
 
 **Rust** - Upload Blob:
-
 ```rust
 use azure_identity::DeveloperToolsCredential;
 use azure_storage_blob::{BlobClient, BlobClientOptions};
@@ -113,8 +107,8 @@ let blob_client = BlobClient::new(
     "my-container",
     "my-blob.txt",
     Some(credential),
-    None
+    Some(BlobClientOptions::default()),
 )?;
 let data = b"Hello, Azure Storage!";
-blob_client.upload(data.to_vec().into(), None).await?;
+blob_client.upload(None, data.to_vec().into()).await?;
 ```
